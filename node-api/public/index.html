@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AskMyNotes — AI-powered study assistant that answers only from your uploaded notes with evidence-grounded responses." />
+  <title>AskMyNotes — Study Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- ── Top Bar ──────────────────────────────────── -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <div class="logo">
+          <span class="logo-icon">📚</span>
+          <h1>AskMyNotes</h1>
+        </div>
+        <span class="tagline">Evidence-grounded study copilot</span>
+      </div>
+      <div class="topbar-right">
+        <div id="streak-badge" class="gamification-badge" title="Study streak">
+          <span class="badge-icon">🔥</span>
+          <span id="streak-count">0</span>
+        </div>
+        <div id="xp-badge" class="gamification-badge" title="Experience points">
+          <span class="badge-icon">⭐</span>
+          <span id="xp-count">0</span> XP
+        </div>
+        <div id="level-badge" class="gamification-badge level" title="Current level">
+          <span id="level-text">Freshman</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-layout">
+      <!-- ── Sidebar ──────────────────────────────────── -->
+      <aside id="sidebar">
+        <!-- Subject Management -->
+        <section class="sidebar-section">
+          <h2 class="section-title">
+            <span>📂</span> Subjects
+            <span class="subject-count" id="subject-counter">0/3</span>
+          </h2>
+          <div id="subject-list" class="subject-list"></div>
+          <div id="add-subject-form" class="add-subject">
+            <input type="text" id="subject-name-input" placeholder="New subject name…" maxlength="30" />
+            <button id="add-subject-btn" class="btn btn-primary btn-sm">+ Add</button>
+          </div>
+        </section>
+
+        <!-- File Upload -->
+        <section class="sidebar-section" id="upload-section" style="display: none;">
+          <h2 class="section-title"><span>📄</span> Upload Notes</h2>
+          <div id="upload-zone" class="upload-zone">
+            <input type="file" id="file-input" accept=".pdf,.txt,.text" hidden />
+            <div class="upload-content" id="upload-content">
+              <span class="upload-icon">📤</span>
+              <p>Drop PDF/TXT here or <strong>click to browse</strong></p>
+            </div>
+            <!-- Animated pipeline -->
+            <div id="ingest-pipeline" class="ingest-pipeline" style="display: none;">
+              <div class="pipeline-step" data-step="parse">
+                <div class="step-indicator"></div>
+                <span>Parse</span>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" data-step="chunk">
+                <div class="step-indicator"></div>
+                <span>Chunk</span>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" data-step="embed">
+                <div class="step-indicator"></div>
+                <span>Embed</span>
+              </div>
+              <div class="pipeline-arrow">→</div>
+              <div class="pipeline-step" data-step="ready">
+                <div class="step-indicator"></div>
+                <span>Ready</span>
+              </div>
+            </div>
+          </div>
+          <div id="upload-status" class="upload-status"></div>
+          <div id="file-list" class="file-list"></div>
+        </section>
+
+        <!-- Gamification Panel -->
+        <section class="sidebar-section">
+          <h2 class="section-title"><span>🏆</span> Achievements</h2>
+          <div id="badges-panel" class="badges-panel"></div>
+          <div class="xp-progress">
+            <div class="xp-bar">
+              <div id="xp-fill" class="xp-fill" style="width: 0%"></div>
+            </div>
+            <span id="xp-progress-text" class="xp-progress-text">0 / 200 XP</span>
+          </div>
+        </section>
+
+        <!-- Study Planning -->
+        <section class="sidebar-section">
+          <h2 class="section-title"><span>📅</span> Study Planner</h2>
+          <div id="study-calendar" class="study-calendar"></div>
+          <div id="pomodoro" class="pomodoro">
+            <span id="pomodoro-time">25:00</span>
+            <button id="pomodoro-btn" class="btn btn-sm btn-outline">▶ Start Focus</button>
+          </div>
+        </section>
+      </aside>
+
+      <!-- ── Content Area ─────────────────────────────── -->
+      <div id="content">
+        <!-- Mode tabs -->
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="chat" id="tab-chat">💬 Ask</button>
+          <button class="mode-tab" data-mode="study" id="tab-study">📝 Study</button>
+          <button class="mode-tab" data-mode="analytics" id="tab-analytics">📊 Analytics</button>
+        </div>
+
+        <!-- Active subject badge -->
+        <div id="active-subject-badge" class="active-subject-badge" style="display: none;">
+          <span class="asb-dot"></span>
+          <span id="asb-name"></span>
+          <span class="asb-scope">100% scoped</span>
+        </div>
+
+        <!-- ── Chat Mode ─────────────────────────────── -->
+        <div id="chat-view" class="view active">
+          <div id="chat-messages" class="chat-messages">
+            <div class="welcome-card">
+              <h2>👋 Welcome to AskMyNotes</h2>
+              <p>Upload your notes and ask questions. I'll answer <strong>only</strong> from your materials — with citations, evidence, and honest confidence scores.</p>
+              <div class="welcome-steps">
+                <div class="ws"><span>1</span> Create a subject</div>
+                <div class="ws"><span>2</span> Upload PDF/TXT notes</div>
+                <div class="ws"><span>3</span> Ask anything</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Input area -->
+          <div class="chat-input-area">
+            <div class="input-row">
+              <button id="mic-btn" class="mic-btn" title="Voice input">
+                <span class="mic-icon">🎤</span>
+                <div class="mic-pulse"></div>
+              </button>
+              <input type="text" id="query-input" placeholder="Ask a question about your notes…" />
+              <button id="send-btn" class="btn btn-primary" disabled>
+                <span>Send</span>
+              </button>
+            </div>
+            <div id="voice-transcript" class="voice-transcript" style="display: none;"></div>
+          </div>
+        </div>
+
+        <!-- ── Study Mode ────────────────────────────── -->
+        <div id="study-view" class="view">
+          <div class="study-header">
+            <h2>📝 Study Mode</h2>
+            <p>Test your knowledge with questions generated from your notes</p>
+            <button id="generate-quiz-btn" class="btn btn-primary" disabled>Generate Quiz</button>
+          </div>
+          <div id="quiz-container" class="quiz-container"></div>
+          <div id="quiz-results" class="quiz-results" style="display: none;">
+            <div class="results-card">
+              <h3>Quiz Complete!</h3>
+              <div id="quiz-score" class="quiz-score"></div>
+              <button id="retry-quiz-btn" class="btn btn-outline">Try Again</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Analytics Mode ────────────────────────── -->
+        <div id="analytics-view" class="view">
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h3>📊 Subject Progress</h3>
+              <div id="subject-progress" class="progress-bars"></div>
+            </div>
+            <div class="analytics-card">
+              <h3>📈 Quiz Performance</h3>
+              <div id="quiz-trend" class="chart-area"></div>
+            </div>
+            <div class="analytics-card">
+              <h3>🔥 Weakness Areas</h3>
+              <div id="weakness-heatmap" class="heatmap"></div>
+            </div>
+            <div class="analytics-card">
+              <h3>🧠 Knowledge Retention</h3>
+              <div id="retention-predictor" class="retention"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Leaderboard modal -->
+    <div id="leaderboard-modal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🏅 Leaderboard</h2>
+          <button class="modal-close" onclick="document.getElementById('leaderboard-modal').style.display='none'">&times;</button>
+        </div>
+        <div id="leaderboard-body" class="leaderboard-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

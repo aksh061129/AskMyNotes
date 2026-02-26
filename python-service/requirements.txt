@@ -1,0 +1,21 @@
+fastapi==0.115.0
+uvicorn==0.30.6
+python-multipart==0.0.9
+pydantic==2.9.2
+
+# LlamaIndex
+llama-index-core==0.12.5
+llama-index-llms-groq==0.3.1
+
+# Vector store & embeddings
+faiss-cpu==1.9.0
+sentence-transformers==3.3.1
+
+# Document parsing
+PyMuPDF==1.25.1
+
+# Readability
+textstat==0.7.4
+
+# Env
+python-dotenv==1.0.1

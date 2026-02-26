@@ -1,0 +1,242 @@
+[
+  {
+    "text": "www.vedantu.com   \n1  \n  \n  \nRevision Notes for Class 12 Physics \nChapter 1 – Electric Charges and Fields \n \n1. Electric Charge \n1.1 Definition- Charge is that property that is associated with the matter due to which it \nproduces and experiences electrical and magnetic effects. \n1.2 Type \nThere exist two types of charges in nature. They are: \ni. Positive charge \nii. Negative charge \nCharges with the same electrical sign repel each other while charges with opposite electrical \nsigns attract each other. \n1.3 Unit and Dimensional Formula \nS.I. unit of charge is coulomb (C), (\n)\n3\n6\n9\n1mC\n10 C,1 C\n10 C,ln C\n10 C\n−\n−\n−\n=\n=\n=\n\n \nC.G.S. the unit of charge is e.s.u. \n9\n1C\n3 10\n= \n esu \nThe Dimensional formula is given by [Q]\n[AT]\n=\n. \n1.4 Point Charge \nWhose spatial size is negligible as compared to other distances. \n1.5 Properties of Charge \n(i) Charge is a Scalar Quantity: Charges can be added or subtracted algebraically.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 1,
+    "chunk_index": 0
+  },
+  {
+    "text": "www.vedantu.com   \n2  \n  \n  \n(ii) Charge is transferable: When a charged body is put in contact with an uncharged body, \nthe uncharged body becomes charged due to transfer of electrons from the charged body to \nthe uncharged body. \n(iii) Charge is always associated with mass: Charge cannot exist without mass though mass \ncan exist without charge. \n(iv) Charge is conserved: Charge can neither be created nor be destroyed. \n(v) Invariance of charge: The numerical value of an elementary charge is independent of \nvelocity. \n(vi) Charge produces an electric field and magnetic field: When a charged particle is at \nrest it only produces an electric field in the space surrounding it. However, if the charged \nparticle is in unaccelerated motion it produces both electric and magnetic fields. And if the \nmotion of the charged particle is accelerated it not only produces electric and magnetic fields \nbut also radiates energy in the space surrounding the charge in the form of electromagnetic \nwaves. \n(vii) Charge resides on the surface of conductor: Charge resides on the outer surface of a \nconductor because like charges repel and try to get as far away as possible from one another \nand stay at the farthest distance from each other which is the outer surface of the conductor. \nTherefore, a solid and hollow conducting sphere of the same outer radius will hold a \nmaximum equal charge, and a soap bubble expands on charging. \n(viii) Quantization of charge: When a physical quantity can have only discrete values \nrather than any value, the quantity is said to be quantised. The smallest charge that can exist \nin nature is the charge of an electron. If the charge of an electron (\n)\n19\n1.6 10\nC\n−\n−\n\n is taken as \nelementary unit i.e. quanta of charge the charge on anybody will be some integral multiple of \ne i.e., Q\n \n= ne with n\n0\n= , 1,2,3\n \n \nCharge on a body can never be 0.5 , 17.2\n\ne\ne or \n5\n10−\n\ne  etc.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 2,
+    "chunk_index": 1
+  },
+  {
+    "text": "www.vedantu.com   \n3  \n  \n  \n1.6 Comparison of Charge and Mass \nWe are familiar with the role of mass in gravitation, and we have just studied some features \nof electric charge. The comparison between the two are as follows: \nS. No \nCharge \nMass \n1. \nElectric charge can be positive, \nnegative or zero. \nMass of a body is a positive quantity. \n2. \nCharge carried by a body does not \ndepend upon the velocity of the \nbody. \nMass of a body increases with its velocity \nas  \n2\n2\n1\n=\n−\no\nm\nm\nv\nc\n where c  id velocity of light in \nvacuum, m  is the mass of the velocity v  \nand \n0\nm  is rest mass of the body. \n3.  \nThe charge is quantized. \nThe quantization of mass is yet to be \nestablished.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 3,
+    "chunk_index": 2
+  },
+  {
+    "text": "www.vedantu.com   \n4  \n  \n  \n4. \nElectric charge is always \nconserved. \nMass is not conserved as it can be \nchanged into energy and vice-versa. \n5. \nForce between charges can be \nattractive(unlike charges) or \nrepulsive(like charges) in nature. \nThe gravitational force between two \nmasses is always attractive. \n \n1.7 Methods of Charging \nA body can be charged by following methods: \ni. By friction:  \nIn friction when two bodies are rubbed together, electrons are transferred from one body to \nthe other. As a result of this one body becomes positively charged while the other is \nnegatively charged, e.g., when a glass rod is rubbed with silk, the rod becomes positively \ncharged while the silk becomes negatively charged. However, ebonite on rubbing with wool \nbecomes negatively charged making the wool positively charged. Clouds also become \ncharged by friction. In charging by friction in accordance with conservation of charge, both \npositive and negative charges in equal amounts appear simultaneously due to the transfer of \nelectrons from one body to the other. \nii. By electrostatic induction:  \nIf a charged body is brought near an uncharged body, the charged body will attract the \nopposite charge and repel a similar charge present in the uncharged body. As a result of this \none side of the neutral body (closer to charged body) becomes oppositely charged while the \nother is similarly charged. This process is called electrostatic induction.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 4,
+    "chunk_index": 3
+  },
+  {
+    "text": "www.vedantu.com   \n5  \n  \n  \n \nNote: Inducting body neither gains nor loses charge.  \n(iii) Charging by conduction:  \nTake two conductors, one charged and the other uncharged. Bring the conductors in contact \nwith each other. The charge (whether negative or positive) under its own repulsion will \nspread over both the conductors. Thus, the conductors will be charged with the same sign. \nThis is called as charging by conduction (through contact). \nNote: A truck carrying explosives has a metal chain touching the ground, to conduct away \nthe charge produced by friction. \n \n2. Coulomb's Law \nIf two stationary and point charges \n1\nQ  and \n2\nQ  are kept at a distance r , then it is found that \nforce of attraction or repulsion between them is Mathematically, Coulomb's law can be \nwritten as",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 5,
+    "chunk_index": 4
+  },
+  {
+    "text": "www.vedantu.com   \n6  \n  \n  \n1\n2\n2\nq q\nF\nk r\n=\n \nwhere k  is a proportionality constant. \nIn SI units k  has the value, \n9\n2\n2\nk\n8.988 10 Nm / C\n=\n\n  \n9\n2\n2\nk\n9.0 10 Nm / C\n=\n\n \n(a) The direction of force is always along the line joining the two charges. \n(b) The force is repulsive if the charges have the same sign and attractive if their signs are \nopposite. \n(c) This force is conservative in nature. \n(d) This is also called inverse square law. \n \n2.1 Variation of k  \nConstant k  depends upon a system of units and medium between the two charges. \na. \nIn C.GS. for air  \n1\n2\n2\nQ Q\n1, F\nDyne\nr\n=\n=\nk\n \nb. In S.I. for air \n2\n9\n2\n0\n1\nN\nm\n9 10\n4\nC\n−\n=\n= \nk\n\n, \n(\n5\n1\n2\n2\n0\nQ Q\n1\nF\n Newton 1 Newton \n10  Dyne) \n4\nr\n=\n\n=\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 6,
+    "chunk_index": 5
+  },
+  {
+    "text": "www.vedantu.com   \n7  \n  \n  \nNote: \n• \n0 =\n\n Absolute permittivity of air or free space \n2\n12\n2\n Farad \n8.85 10−\n\n\n=\n\n=\n\n\n−\n\n\nC\nN\nm\nm\n \nDimension is \n1\n3\n4\n2\n−\n−\n\n\n\n\nM\nL T A\n \n• \n0 Relates with absolute magnetic permeability (\n)\n0\n\n and velocity of light ( )c  \naccording to the following relation \n0\n0\n1\n=\nc\n \n2.1.2 Effect of Medium \n(a) When a dielectric medium is completely filled in between charges rearrangement of the \ncharges inside the dielectric medium takes place and the force between the same two charges \ndecreases by a factor of K  known as dielectric constant, K  is also called relative \npermittivity \nr of the medium (relative means with respect to free space). \nHence in the presence of medium \nair \n1\n2\n2\n0\n1\n4\n=\n=\n\nm\nF\nQ Q\nF\nK\nK\nr\n\n \nHere \n0\n0\nr\nK =\n=\n\n\n (permittivity of medium) \nMedium \nK  \nVacuum/air \n1",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 7,
+    "chunk_index": 6
+  },
+  {
+    "text": "www.vedantu.com   \n8  \n  \n  \nWater \n80 \nMica \n6 \nGlass \n5-10 \nMetal \n \n \n2.2 Vector Form of Coulomb's Law \nIt is helpful to adopt a convention for subscript notation. \n12\nF = force on 1 due to \n21\n2\nF =  force on 2 due to 1D \nSuppose the position vectors of two charges \n1q  and \n2\nq  are \n1r  and \n2r , then, electric force on \ncharge \n1q  due to charge \n2\nq  is, \n(\n)\n1\n2\n12\n1\n2\n3\n0\n1\n2\n1\nF\nr\nr\n4\nr\nr\n=\n−\n−\nq q\n\n \nSimilarly, electric force on \n2\nq  due to charge \n1q  is \n(\n)\n1\n2\n21\n2\n1\n3\n0\n2\n1\n1\nF\n4\n=\n−\n−\nq q\nr\nr\nr\nr\n\n \nForce is a vector, so in vector form the Coulomb's law is written as",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 8,
+    "chunk_index": 7
+  },
+  {
+    "text": "www.vedantu.com   \n9  \n  \n  \n1\n2\n12\n12\n2\n0\nq q\n1\nF\nr\n4\nr\n= \n \nWhere \n12\nr  is a unit vector, directed toward \n1q  from \n2\nq . \nNote: \n12\n21\n \nˆ\nˆ\n= −\nr\nr  \n(\n)\n1\n2\n2\n1\n12\n12\n21\n2\n2\n0\n0\nq q\nq q\n1\n1\nF\nr\nr\n4\nr\n4\nr\n=\n=\n−\n\n\n \n2\n1\n12\n21\n21\n2\n0\nq q\nF\n \n1\nr\nF\n4\nr\n \n= −\n= −\n\n \nRemember convention for r . \nHere \n1q  and \n2q  are to be substituted with sign. Position vector of charges \n1q  and \n2q  are \n1\n1\n1\n1 ˆ\nˆ\nˆ\n=\n+\n+\nr\nx i\ny j\nz k  and 2\n2\n2\n2 ˆ\nˆ\nˆ\n=\n+\n+\nr\nx i\ny j\nz k  respectively. Where (\n)\n1\n1\n1\n,\n,\nx y z\n and  (\n)\n2\n2\n2\n,\n,\nx\ny\nz\n are the \nco-ordinates of charges \n1q  and \n2\nq . \n \n2.3 Principle of Superposition \nAccording to the principle of superposition, the total force acting on a given charge due to a \nnumber of charges is the vector sum of the individual forces acting on that charge due to all \nthe charges.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 9,
+    "chunk_index": 8
+  },
+  {
+    "text": "Consider number of charges Q1, Q2, Q3…..are applying force on a charge Q  \nNet force on Q  will be \nnet \n1\n2\nn 1\nn\nF\n \n \n \nF\n \nF\nF\nF\n−\n=\n+\n+ +\n+\n \nThe magnitude of the resultant of two electric force is given by \n2\n2\n1\n2\n1\n2\nF\nF\nF\n2 F F cos\n=\n+\n+\n and \nthe force direction is given by,",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 9,
+    "chunk_index": 9
+  },
+  {
+    "text": "www.vedantu.com   \n10  \n  \n  \n \n2\n1\n2\nsin\ntan\ncos\n =\n+\nF\nF\nF\n\n\n \n \n3. Electric Field \nA positive charge or a negative charge is said to create its field around itself. Thus space \naround a charge in which another charged particle experiences a force is said to have an \nelectrical field in it. \n3.1 Electric Field Intensity ( )\nE  \nThe electric field intensity at any point is defined as the force experienced by a unit positive \ncharge placed at that point.  \n0\n= F\nE\nq  \nWhere \n0\n0\n→\nq\n so that presence of this charge may not affect the source charge Q  and its \nelectric field is not changed, therefore expression for electric field intensity can be better \nwritten as:  \n0\n0\n0\nlim\n→\n=\nq\nF\nE\nq  \n(a) Unit and Dimensional formula:  \nIt's S.I. unit is, \n Newton \n volt \n Joule \n coulomb \n meter \n coulomb \n meter \n=\n=\n\n and \nC.G.S. unit = Dyne/statcoulomb.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 10,
+    "chunk_index": 10
+  },
+  {
+    "text": "www.vedantu.com   \n11  \n  \n  \nDimension: \n3\n1\nE\nMLT A\n−\n−\n\n\n= \n \n(b) Direction of electric field: Electric field (intensity) E is a vector quantity. Electric field \ndue to a positive charge is always away from the charge and that due to a negative charge is \nalways towards the charge. \n3.2 Relation Between Electric Force and Electric Field \nIn an electric field E a charge ( )\nQ  experiences a force \n=\nF\nQE . If the charge is positive then \nforce is directed in the direction of the field while if the charge is negative force acts on it in \nthe opposite direction of field. \n3.3 Superposition of Electric Field \nThe resultant electric field at any point is equal to the vector sum of electric fields at that \npoint due to various charges. \n1\n2\n3\nE\nE\nE\n \nE\n \n=\n+\n+\n+  \nThe magnitude of the resultant of two electric fields are given by \n2\n2\n1\n2\n1\n2\nE\nE\nE\n2E E cos\n=\n+\n+\n and the direction is given by, \n2\n1\n2\nsin\ntan\ncos\n =\n+\nE\nE\nE\n\n\n \n3.4 Point Charge \nPoint charge produces its electric field at a point P  which is distance r  from it given by, \nP\n2\n0\nQ\nE\n4\nr\n= \n (Magnitude) \nFor positive point charge, E  is directed away from it.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 11,
+    "chunk_index": 11
+  },
+  {
+    "text": "www.vedantu.com   \n12  \n  \n  \nFor negative point charge, E  is directed towards it. \n3.5 Continuous Charge Distributions \nThere is an infinite number of ways in which we can spread a continuous charge distribution \nover a region of space. Mainly three types of charge distributions will be used. We define \nthree different charge densities. \nSymbol \nDefinition \nSI units \n(lambda) \nCharge per unit length \nC/m \n(sigma)  \nCharge per unit area \n2\nC/m  \n(rho)  \nCharge per unit volume \n3\nC/m  \nIf a total charge q  is distributed along a line of length , over a surface area A or throughout \na volume V, we can calculate charge densities from. \n,\n \n \n \nq\nq\nq\n,\nA\nV\n=\n=\n=\n\n\n\n \n3.6 Properties of Electric Field Lines \n1. Electric field lines originate from a positive charge & terminate on a negative charge.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 12,
+    "chunk_index": 12
+  },
+  {
+    "text": "www.vedantu.com   \n13  \n  \n  \n2. The number of field lines originating/terminating on a charge is proportional to the \nmagnitude of the charge. \n3. The number of Field Lines passing through the perpendicular unit area will be \nproportional to the magnitude of the Electric Field there. \n4. Tangent to a Field line at any point gives the direction of the Electric Field at that point. \nThis will be the instantaneous path charge will take if kept there. \n5. Two or more field lines can never intersect each other. \n(they cannot have multiple directions) \n6. Uniform field lines are straight, parallel & uniformly placed. \n7. Field lines cannot form a loop. \n8. Electric field lines originate and terminate perpendicular to the surface of the conductor. \nElectric field lines do not exist inside a conductor. \n9. Field lines always flow from higher potential to lower potential. \n10. If in a region electric field is absent, there will be no field lines. \n \n3.7 Motion of Charged Particle in an Electric Field \n(a) When charged particle initially at rest is placed in the uniform field: \nLet a charge particle of mass m  and charge Q  be initially at rest in an electric field of \nstrength E .",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 13,
+    "chunk_index": 13
+  },
+  {
+    "text": "www.vedantu.com   \n14  \n  \n  \n \n(i) Force and acceleration:  \nThe force experienced by the charged particle is \n=\nF\nQE . Positive charge experiences force \nin the direction of electric field while negative charge experiences force in the direction \nopposite to the field. [Fig. (A)] \nAcceleration produced by this force is \nF\nQE\na\nm\nm\n=\n=\n \nSince the field E  in constant the acceleration is constant, thus motion of the particle is \nuniformly accelerated. \n(ii) Velocity:  \nSuppose at point A  particle is at rest and in time t , it reaches the point B",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 14,
+    "chunk_index": 14
+  },
+  {
+    "text": "www.vedantu.com   \n15  \n  \n  \n=\nV\n Potential difference between A  and B  \n=\nS\n Separation between A  and B  \n(a) By using \nE\nu\nat,\n0\nQ m\n=\n+\n=\n+\nv\nv\n \nQEt\nt\nm\n\n=\nv\n \n(b) By using, \n2\n2\n2\nQE\n2QEs\nv  = u  + 2as,v =0+2\ns=\nm\nm\n\n\n \n(iii) Momentum:  \nMomentum \n=\np\nmv , \nQEt\np\nm\nQEt\nm\n=\n\n=\n \n(iv) Kinetic energy:  \nKinetic energy gained by the particle in time t  is \n2\n2\n2 2\n2\n1\n1\n(QEt)\nQ E t\nK\nmv\nm\n2\n2\nm\n2 m\n=\n=\n=\n \n(b) When a charged particle enters with an initial velocity at a right angle to the \nuniform field. \nWhen a charged particle enters perpendicularly in an electric field, it describes a parabolic \npath as shown.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 15,
+    "chunk_index": 15
+  },
+  {
+    "text": "www.vedantu.com   \n16  \n  \n  \n(i) Equation of trajectory:  \nThroughout the motion, a particle has uniform velocity along x -axis and horizontal \ndisplacement ( )x  is given by the equation \n=\nx\nut  \nSince the motion of the particle is accelerated along y -axis, we will use the equation of \nmotion for uniform acceleration to determine displacement y. \nFrom \n2\n1\nS\nut\nat\n2\n=\n+\n \nWe have \n0\n=\nu\n (along \n−\ny\naxis) so \n2\n1\n2\n=\ny\nat  \ni.e., displacement along y -axis will increase rapidly with time (since y \n)\n2t\n\n \nFrom displacement along x-axis, t\nx / u\n=\n \nSo \n2\n1\n;\n2\n\n\n\n=\n\n\n\n\n\n\nQE\nx\ny\nm\nu\n this is the equation of parabola which shows \n2\ny\nx\n\n. \n(ii) Velocity at any instant:  \nAt any instant ,\n=\nx\nt v\nu  and \ny\nQEt\nm\n=\nv\n. \nSo, \n2\n2 2\n2\n2\n2\nx\ny\n2\nQ E t\n|\n|\nu\nm\n \n=\n=\n+\n=\n+\nv\nv\nv\nv\n \nIf  is the angle made by v  with x -axis than \nQEt\ntan\n.\n \nmu\n=\n=\ny\nx\nv\nv\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 16,
+    "chunk_index": 16
+  },
+  {
+    "text": "www.vedantu.com   \n17  \n  \n  \n4. Electric Dipole \n4.1 General Information \nA system of two equal and opposite charges separated by a small, fixed distance is called a \ndipole. \n(i) Dipole axis: Line joining negative charge to positive charge of a dipole is called its axis. \nIt may also be termed as its longitudinal axis. \n(ii) Equatorial axis: Perpendicular bisector of the dipole is called its equatorial or transverse \naxis as it is perpendicular to the length. \n(iii). Dipole length: The distance between two charges is known as dipole length (d). \n(iv). Dipole moment: It is a quantity that gives information about the strength of dipole. It is \na vector quantity and is directed from negative charge to positive charge along the axis. It is \ndenoted as p and is defined as the product of the magnitude of either of the charge and the \ndipole length. \n i.e., \n( )\n=\np\nq d  \nIts S.I. unit is coulomb-metre or Debye (1 Debye = \n)\n30\n3.3 10−\n\n\nC\nm  and its dimensions are \n0\n1\n1\n1\nM LT A . \nNote: \n• \nA region surrounding a stationary electric dipole has electric field only. \n• \nWhen a dielectric is placed in an electric field, its atoms or molecules are considered \nas tiny dipoles. \n(a) Electric Potential due to a dipole \nP\nk(\n)\nk( q)\nV\nAP\nBP\n−\n+\n=\n+\nq",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 17,
+    "chunk_index": 17
+  },
+  {
+    "text": "www.vedantu.com   \n18  \n  \n  \n \n\nr\nd  (distance ' r  ' is large as compared to d) \nAP\nO P;\nBP\nO P\n\n\n\n\n \nP\nr\nd / 2cos ,\nP\nr\nd / 2cos\n\n= +\n= −\nO\nO\n\n \np\nk( q)\nk( q)\nV\n(r\nd / 2cos )\n(r\nd / 2cos )\n−\n+\n=\n+\n+\n−\n\n \n1\n1\nk( q) r\nd / 2cos\nr\nd / 2cos\n\n\n=\n+\n−\n\n\n−\n+\n\n\n\n \n2\n2\n2\n2\n2\n2\nd / 2cos\nr\nd / 2cos\nkqdcos\nkq\nd\nd\nr\ncos\nr\ncos\n4\n \n4\n\n\n\n\n+\n−+\n=\n=\n\n\n\n\n−\n−\n\n\n\n\nr\n\n\n\n\n\n \n2\n2\n2\n2\n2\n2\nk(qd)cos\nkpcos\nV\n[ p\nqd]\nd\nd\nr\ncos\nr\ncos\n4\n4\n=\n=\n=\n−\n−\np\n\n\n\n\n \nsince \n \n\nr\nd  \np\n2\n2\n0\nkpcos\n1\npcos\nV\nr\n4\nr\n=\n=\n\n\n\n\n \n is angle with the axis of dipole; r  is distance from centre of dipole.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 18,
+    "chunk_index": 18
+  },
+  {
+    "text": "(b) Electric Field due to dipole \n(i) For points on the axis \nLet the point P be  at distance r  from the centre of the dipole on the side of the charge q ,as \nshown in the below figure.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 18,
+    "chunk_index": 19
+  },
+  {
+    "text": "www.vedantu.com   \n19  \n  \n  \n \nThen \n2\n0\nˆ\n4\n(\n)\n \n−= −\n+\nq\nq\nE\np\nz r\na\n\n \nwhere p  is the unit vector along the dipole axis (from −q  to q ). Also, \nq\n2\n0\nq\nE\np\n4\n(r\na)\n+ =\n−\n\n \nThe total field at P is,  \n2\n2\n0\n1\n1\nˆ\n4\n(\n)\n(\n)\n+\n−\n\n\n=\n+\n=\n−\n\n\n−\n+\n\n\nq\nq\nq\nE\nE\nE\np\nr\na\nr\na\n\n(\n)\n2\n2\n2\n0\n4\nˆ\n4\n=\n−\nq\nar\np\nr\na\n\n \nFor \n\nr\na  \n3\n0\n4\nˆ\n(\n)\n4\n \n=\n\nqa\nE\np\nr\na\nr\n\n…(i) \n(ii) For points on the equatorial plane \nThe magnitudes of the electric fields due to the two charges q\n+  and q\n− are given by,",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 19,
+    "chunk_index": 20
+  },
+  {
+    "text": "www.vedantu.com   \n20  \n  \n  \n2\n2\n0\n1\n4\n+ =\n+\nq\nq\nE\nr\na\n\n \n2\n2\n0\n1\n4\n−=\n+\nq\nq\nE\nr\na\n\n \nand are equal. \n \nThe directions of \n+q\nE  and \n−q\nE  are as shown in fig. (b). Clearly, the components normal to the \ndipole axis cancel away. The components along the dipole axis add up. The total electric \nfield is opposite to p . We have, \n(\n)\nq\nE\nE\nE\ncos p\n \n+\n−\n= −\n+\n\n \n  \n(\n)\n3/2\n2\n2\n0\n2qa\np\nr\n \n4\na\n= −\n+\n\n \nAt large distances (\n)\n \n\nr\na , this reduces to \n(\n)\n3\n0\n \nˆ\n \n2\n4\n\n= −\nr\na\nqa\nE\np\nr\n\n…(ii) \nFrom Eqs. (i) and (ii), it is clear that the dipole field at large distances does not involve q  \nand a separately; it depends on the product $qa$. This suggests the definition of dipole is \ndefined by \nP\nq\n2ap\n=\n\n \nthat is, it is a vector whose magnitude is charge q  times the separation 2a (between the pair \nof charges q, - q) and the direction is along the line from −q  to q .  \nIn terms of p, the electric field of a dipole at large distances takes simple forms: \nAt a point on the dipole axis",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 20,
+    "chunk_index": 21
+  },
+  {
+    "text": "www.vedantu.com   \n21  \n  \n  \n3\n3\n0\n2\n2\n(\n)\n \n4\n=\n=\n\np\nkp\nE\nr\na\nr\nr\n\n \nAt a point on the equatorial plane. \n3\n3\n0\np\nkp\nE\n(r\na)\n4\nr\nr\n \n−\n=\n=\n\n\n \n \n4.3 Electric Dipole in a Uniform Electric Field \n(i) Force and Torque: If a dipole is placed in a uniform field such that dipole (i.e. p  ) \nmakes an angle  with the direction of field then two equal and opposite forces acting on \ndipole constitute a couple whose tendency is to rotate the dipole hence torque is developed in \nit and dipole tries to align itself in the direction of the field. Consider an electric dipole in \nplaced in a uniform electric field such that dipole (i.e., p ) makes an angle  with the \ndirection of the electric field as shown. \n(a) Net force on electric dipole \nnet\nF\n0\n=  \n(b) \npEsin (\np\nE)\n \n \n \n \n \n\n=\n=\n\n\n\n \n(ii) Work: From the above discussion it is clear that in an uniform electric field dipole tries \nto align itself in the direction of electric field (i.c. equilibrium position). To change it's \nangular position some work has to be done. \nSuppose an electric dipole is kept in an uniform electric field by making an angle \n1\n with the \nfield, if it is again turn so that it makes an angle \n2\n with the field, work done in this process \nis given by the formula \n(\n)\n1\n2\nW  =  qE cos\ncos\n−\n\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 21,
+    "chunk_index": 22
+  },
+  {
+    "text": "www.vedantu.com   \n22  \n  \n  \n(iii) Potential energy: In case of a dipole (in a uniform field), potential energy of dipole is \ndefined as work done in rotating a dipole from a direction perpendicular to the field to the \ngiven direction i.e. if \n1\n90\n=\no\n\n and \n2 =\n\n then \n90\ncos\n=\n=\n−\n= −\no\nW\nU\nU\nU\nPE\n\n\n \n(\n)\n90\ncos\n0\n\n= −\n=\n= −\nU\nPE\nU\norU\nPE\n\n\n \n \n5. Neutral Point \nA neutral point is a point where resultant electrical field is zero. Thus neutral points can be \nobtained only at those points where the resultant field is subtractive. \n(a) At an internal point along the line joining two like charges (Due to a system of two \nlike point charge): Suppose two like charges. \n1\nQ  and \n2\nQ  are separated by a distance x from \neach other along a line as shown in following figure. \n \nIf N is the neutral point at a distance \n1x  from \n1\nQ  and at a distance \n(\n)\n2\n1\n=\n−\nx\nx\nx  from \n2\nQ  then \nfor natural pt. at N , \n| E.F. due to \n1 | |\n.\n=\nQ\nE F  due to \n2\nQ ∣ i.e., \n2\n1\n2\n1\n1\n2\n2\n0\n1\n0\n2\n2\n2\n1\n1\n4\n4\n\n\n\n=\n\n\n= \n\n\n\nQ\nQ\nQ\nx\nx\nx\nQ\nx\n\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 22,
+    "chunk_index": 23
+  },
+  {
+    "text": "www.vedantu.com   \n23  \n  \n  \nShort trick: \n1\n2\n1\n2\n2\n1\n and \n1\n| / |\n1\n/\n=\n=\n+\n+\nx\nx\nx\nx\nQ\nQ\nQ\nQ\n∣ \nNote: \nIn the above formula if \n1\n2\n=\nQ\nQ , neutral point lies at the centre so remember that resultant \nfield at the midpoint of two equal and like charges is zero. \n(b) At an external point along the line joining two unlike charges (Due to a system of \ntwo unlike point charge):  \nSuppose two unlike charges \n1\nQ  and \n2\nQ  separated by a distance x  from each other. \nHere neutral point lies outside the line joining two unlike charges and also it lies nearer to \ncharge which is smaller in magnitude. \nIf \n1\n2\n\nQ\nQ\n∣\n then neutral point will be obtained on the side of \n1\nQ , suppose it is at a distance l  \nfrom \n1\nQ  Hence at neutral point; \n2\n1\n2\n1\n2\n2\n2\nk\nk Q\n(\n)\n2\n\n\n=\n\n= \n\n+\n+\n\n\nQ\nQ\nx\nQ\nx\n\n \nShort trick: \n(\n)\n2\n1\n/\n1\n \n \n=\n−\nx\nQ\nQ\n \nNote: \nIn the above discussion if \n1\n2\n=\nQ\nQ  neutral point will be at infinity.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 23,
+    "chunk_index": 24
+  },
+  {
+    "text": "www.vedantu.com   \n24  \n  \n  \n6. Equilibrium of Charge \n(a) Definition: A charge is said to be in equilibrium, if net force acting on it is zero. A \nsystem of charges is said to be in equilibrium if each charge is in equilibrium. \n(b) Type of equilibrium: Equilibrium can be divided in following type: \n(i) Stable equilibrium: After displacing a charged particle from it's equilibrium position, if \nit returns back then it is said to be in stable equilibrium. If U  is the potential energy then in \ncase of stable equilibrium U  is minimum. \n(ii) Unstable equilibrium: After displacing a charged particle from it's equilibrium position, \nif it never returns back then it is said to be in unstable equilibrium and in unstable \nequilibrium, U is maximum. \n(iii) Neutral equilibrium: After displacing a charged particle from it's equilibrium position \nif it neither comes back, nor moves away but remains in the position in which it was kept it \nis said to be in neutral equilibrium and in neutral equilibrium, U is constant. \n(c) Different cases of equilibrium of charge \nSuppose three similar charges \n1,\nQ q  and \n2\nQ  are placed along a straight line as shown below. \nCase -1: \nCharge q  will be in equilibrium if \n1\n2\nF\nF\n=\n ie.,,\n2\n1\n1\n2\n2\nQ\nx\nQ\nx\n\n\n= \n\n\n\n; \nThis is the condition of equilibrium of charge q . After following the guidelines, we can say \nthat charge q  is in stable equilibrium and this system is not in equilibrium. \n1\n2\n2\n1\n1\n2\n and \n1\n/\n1\n/\n=\n=\n+\n+\nx\nx\nx\nx\nQ\nQ\nQ\nQ  \ne.g. if two charges 4\n+\nC\n\n and 16\n+\nC\n\n are separated by a distance of 30 cm  from each other \nthan for equilibrium a third charge should be placed between them at a distance",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 24,
+    "chunk_index": 25
+  },
+  {
+    "text": "www.vedantu.com   \n25  \n  \n  \n1\n2\n30\nx\n10 cm or x\n20 cm\n1\n16/ 4\n=\n=\n=\n+\n \nCase-2: \nTwo similar charge \n1\nQ  and \n2\nQ  are placed along a straight line at a distance x  from each \nother and a third dissimilar charge q  is placed in between them as shown below \nCharge g  will be in equilibrium if \n1\n2\nF\nF\n=\n \ni.e., \n2\n1\n1\n2\n2\n\n\n= \n\n\n\nQ\nx\nQ\nx\n. \nNote: \nSame short trick can be used here to find the position of charge q  as we discussed in Case-1 \ni.e., \n1\n2\n1\n1\n/\n=\n+\nx\nx\nQ\nQ  and \n2\n1\n2\n1\n/\n=\n+\nx\nx\nQ\nQ  \nIt is very important to know that magnitude of charge q  can be determined if one of the \nextreme charge (either \n1\nQ . or \n)\n2\nQ\n is in equilibrium ie. if \n2\nQ  is in equilibrium then\n(\n)\n2\n1\n2\nQ\nx / x\n=\nq\n and if \n1\nQ  is in equilibrium then \n(\n)\n2\n2\n1\n| q | Q\nx / x\n(It\n=\n should be remember that \nsign of q  is opposite to that of \n(\n))\n1\n2\nor \nQ\nQ\n. \nCase -3: \nTwo dissimilar charge \n1\nQ  and \n2\nQ  are placed along a straight line at a distance x from each \nother, a third charge q should be placed outside the line joining \n1\nQ  and \n2\nQ  for it to \nexperience zero net force. \n(Let \n)\n2\n1\n\nQ\nQ\n∣",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 25,
+    "chunk_index": 26
+  },
+  {
+    "text": "www.vedantu.com   \n26  \n  \n  \nShort Trick : \nFor its equilibrium. Charge q  lies on the side of charge which is smallest in magnitude and \n1\n2\n/\n1\n=\n−\nx\nd\nQ\nQ\n \n \n7. Electric Dipole \n7.1 Electric Field Due to a Dipole \n \nUsing the concept that if we know potential electric field can be calculated we have already \ncalculated \np\n2\nkpcos\nV\nr\n=\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 26,
+    "chunk_index": 27
+  },
+  {
+    "text": "www.vedantu.com   \n27  \n  \n  \nTo Calculate net electric field at P we need E  (Radial Component) & \n1\nE  (tangential \ncomponent) of electric field at P. \nr\ndV\nE\n.\ndr\n−\n=\n (When we travel in the radial direction). \nt\ndV\nE\nd\n r\n= −\n  (When we travel in the tangential direction).",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 27,
+    "chunk_index": 28
+  },
+  {
+    "text": "dr\n−\n=\n (When we travel in the radial direction). \nt\ndV\nE\nd\n r\n= −\n  (When we travel in the tangential direction).   \np\n2\nkPcos\nV\nr\n=\n \nr\n2\n3\nd\nkPcos\n2kPcos\nE\ndr\nr\nr\n−\n\n=\n=\n\n\n\n\n\n \nt\n2\n3\n3\nd\nkPcos\nkP d\nkPsin\nE\ncos\nrd\nr\nr\nd\nr\n \n−\n−\n\n\n=\n=\n=\n\n\n\n\n\n\n\n\n\n \n2\n2\n2\n2\n2\nnet \n3\n4cos\nsin\n \n \n\n\n\n=\n+\n=\n+\n\n\n\n\n\nr\nt\nkP\nE\nE\nE\nr\n\n \n2\n2\n3\n1 3cos\n\n\n\n=\n+\n\n\n\n\n\nnet\nkP\nE\nr\n \n2\n3\n \n1 3cos\n=\n+\nnet\nkP\nE\nr\n \n3\n1\n3\n \nsin\ntan\ntan\ntan\ntan\ncos\n2\n2\n2\n \n−\n\n=\n=\n=\n=\n\n\n\n\nt\nr\nkP\nE\nr\nkP\nE\nr\n\n\n\n\n\n\n \n(Note:  is the angle with the radial direction)",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 27,
+    "chunk_index": 29
+  },
+  {
+    "text": "www.vedantu.com   \n28  \n  \n  \n7.2 Equilibrium of Dipole \nWe know that, for any equilibrium net torque and net force on a particle (or system) should \nbe zero. \nWe already discussed when a dipole is placed in an uniform electric field net force on dipole \nis always zero. But net torque will be zero only when \n0\n =\no\n\n or \n0\n180 . \nWhen \n0\n =\no\n\n i.e., dipole is placed along the electric field it is said to be in stable equilibrium, \nbecause after turning it through a small angle, dipole tries to align itself again in the direction \nof electric field. \n \nStable equilibrium  \n \n \nUnstable equilibrium \nWhen \n0\n 18\n=\no\n\n i.e., dipole is placed opposite to electric field, it is said to be in unstable \nequilibrium. \n0\n =\n\n \nmax = pE\n\n \n \n0\n =\n\n \n0\n=\nW\n \n=\nW\npE  \n \nmax\n2\n=\nW\npE  \nmin\n \n= −\nU\npE  \n0\n=\nU\n  \nmax =\nU\npE",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 28,
+    "chunk_index": 30
+  },
+  {
+    "text": "www.vedantu.com   \n29  \n  \n  \nGauss’s Law \n1. Electric Flux \n1.1 Definition \nElectric flux is defined as proportional to number of field lines crossing or cutting any area \nof cross section in space. \n'The number of field lines passing through perpendicular unit area will be proportional to the \nmagnitude of Electric Field there (Theory of Field Lines) \nN\nE\nN\nE\nA\n⊥\n⊥\n\n\n\n \n \n\n Electric Flux, \nEA\n⊥\n⊥\n\n=\nA\n \nAs  increases, flux through area A decreases. If we draw a vector of magnitude A  along \nthe positive normal, it is called the area vector, A  corresponding to the area A .",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 29,
+    "chunk_index": 31
+  },
+  {
+    "text": "www.vedantu.com   \n30  \n  \n  \n \n\n Electric Flux, \nEAcos\nE A\n \n=\n=\n\nA\n\n \n(Assuming Electric Field is uniform over whole area) \nNote: \nIf Electric field is not constant over the area of cross section, then \n \nE dA\n \n=\n\nA\n \n1.2 Unit and Dimension \nFlux is a scalar quantity. \nS.I. unit : (volt m)\n\n or \n2\nN m\nC\n\n \nIt’s Dimensional formula: (\n)\n3\n3\n1\nML T\nA\n−\n−",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 30,
+    "chunk_index": 32
+  },
+  {
+    "text": "www.vedantu.com   \n31  \n  \n  \n \n1.3 Types of Flux \nFor a closed body outward flux is taken to be positive, while inward flux is taken to be \nnegative. \n \n2. Gauss's Law \n2.1 Definition \nAccording to Gauss's law, total electric flux through a closed surface enclosing a charge is \n0\n1\n times the magnitude of the charge enclosed. \ni.e., \n(\n)\nnot\ncc\n0\n1\n=\nQ\n\n\n \ni.e., \n0\n \n=\n\nen\nQ\nE dA\nE .",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 31,
+    "chunk_index": 33
+  },
+  {
+    "text": "www.vedantu.com   \n32  \n  \n  \nNote: \nGauss's law is only applicable for a closed surface. \n2.2 Gaussian Surface \nThe closed surface on which Gauss law is applicable is defined as a Gaussian surface. \nNote: \n• \nGaussian surface can be of any shape \\& size, only condition is that it should be \nclosed. \n• \nGaussian surface is hypothetical in nature. It does not have a physical existence. \n2.3 Deriving Gauss's Law from Coulomb's Law \nLet’s take a spherical gaussian surface with charge ' +Q' kept at the centre.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 32,
+    "chunk_index": 34
+  },
+  {
+    "text": "www.vedantu.com   \n33  \n  \n  \nWe know field lines for a +ve charge are always radially outward. \nAngle between dA and E  is zero. \n2\n2\n0\nkQ\nQ\nE\nr\n4\nr\n=\n=\n\n\n \nHence Net flux \n0\n/\n= Q . \nAlthough we derived gauss law for a spherical surface it is valid for any shape of gaussian \nsurface and for any charge kept anywhere inside the surface. \n2.4 Coulomb's Law from Gauss's Law \nWe choose an imaginary sphere (Gaussian surface) of radius r  centred on the charge q\n+ . \nDue to symmetry, E  must have the same magnitude at any point on the surface, and E  \npoints radially outward, parallel to dA . Hence we write the integral in Gauss's law as: \n \n(\n)\n2\nnet \n \n4\n \n=\n\n=\n=\n=\n\n\n\nE dA\nEdA\nE\ndA\nE\nr\n\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 33,
+    "chunk_index": 35
+  },
+  {
+    "text": "www.vedantu.com   \n34  \n  \n  \nenclosed =\nQ\nq  \nThus, (\n)\n2\n0\n4\n= q\nE\nr\n\n or \n2\n0\n4\n=\nq\nE\nr\n\n \nFrom the definition of the electric field, the force on a point charge \n0\nq  located at a distance r  \nfrom the charge q is \n0\nF\nq E\n=\n. Therefore, \n0\n2\n0\nqq\n1\nF\n4\nr\n= \n \nwhich is Coulomb's law. \n \n3. Applications of Gauss's Law \nUsing Gauss's law to derive ‘E’ due to various charge distributions. \n3.1 Electric Field Due to a Line Charge \nConsider an infinite line which has a linear charge density . Using Gauss's law, let us find \nthe electric field at a distance ' r ' from the line charge. \nThe cylindrical symmetry tells us that the field strength will be the same at all points at a \nfixed distance r  from the line. Thus, if the charges are positive. The field lines are directed \nradially outwards, perpendicular to the line charge. \nThe appropriate choice of Gaussian surface is a cylinder of radius r  and length L . On the \nflat end faces, \n2\nS  and \n3\nS ,E  is perpendicular dS, which means flux is zero on them. On the \ncurved surface \n1,\nS E  is parallel to dS , so that E dS\nEdS\n \n \n\n=\n. The charge enclosed by the \ncylinder is \n=\nQ\nL\n. Applying Gauss's law to the curved surface, we have \n0\n0\nL\n2k\nE\ndS\nE(2 rL)\n or E\n2\nr\nr\n =\n=\n=\n=\n\n\n\n\n\n\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 34,
+    "chunk_index": 36
+  },
+  {
+    "text": "www.vedantu.com   \n35  \n  \n  \nNote: \nThis is the field at a distance r  from the line. It is directed away from the line if the charge is \npositive and towards the line if the charge is negative. \n \n3.2 Electric Field Due to a Plane Sheet of Charge \nConsider a large plane sheet of charge with surface charge density (charge per unit area) \n$\\sigma $. We have to find the electric field ${\\text{E}}$ at a point ${\\text{P}}$ in front of \nthe sheet. \n \nNote: \nIf the charge is positive, the field is away from the plane. \nTo calculate the field E  at P . Choose a cylinder of area of cross-section A through the point \nP as the Gaussian surface. The flux due to the electric field of the plane sheet of charge \npasses only through the two circular caps of the cylinder. \nAccording to Gauss law \nin \n0\n/\n \n=\nE dS\nq\n",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 35,
+    "chunk_index": 37
+  },
+  {
+    "text": "www.vedantu.com   \n36  \n  \n  \n0\nI circular surface\nII circular surface\ncylindricalr surface\n \n.\n.\n \n.\n \n+\n+\n=\n\n\n\nA\nE dS\nE dS\nE dS\n\n\n \nor \n0\nA\nEA\nEA\n0\n+\n+\n= \n\n \nor \n0\n2\n=\nE\n\n \nNote: \nWe see that the field is uniform and does not depend on the distance from the charge sheet. \nThis is true as long as the sheet is large as compared to its distance from P . \n \n3.3 Uniform Spherical Charge Distribution \n3.3.1 Outside the Sphere \nP is a point outside the sphere at a distance r  from the centre.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 36,
+    "chunk_index": 38
+  },
+  {
+    "text": "www.vedantu.com   \n37  \n  \n  \nAccording to Gauss law, \nD\nQ\nE ds\nE\n \n \n\n=\n\n or (\n)\n2\nD\nQ\nE 4 r\n=\n\n\n \nElectric field at P (Outside sphere) \n2\nout \n2\n2\n0\n0\n1\n4\n=\n\n=\nQ\nR\nE\nr\nr\n\n\n\n and \n2\nr\nout \n0\n0\n \n \nr\n1\nQ\nR\nV\nEdr\n4\nr\n\n= −\n=\n\n=\n\n\n\n\n \nNote: \n0\n= \nQ\nA   \n2\n4\n \n=\n\nR\n\n\n \n3.3.2 At the surface of sphere \nAt surface \n=\nr\nR  \nSo, \n2\n0\n0\n1\n4\n=\n\n=\ne\nQ\nE\nR\n\n\n and \n0\n0\n1\n4\n=\n\n=\nQ\nR\nV\nR\n\n\n\n\n \n3.3.3 Inside the Sphere \nInside the conducting charged sphere electric field is zero and potential remains constant \neverywhere and equals to the potential at the surface.",
+    "filename": "CBSE Notes Class 12 Physics Chapter 1 - Free PDF (1).pdf",
+    "page": 37,
+    "chunk_index": 39
+  }
+]
