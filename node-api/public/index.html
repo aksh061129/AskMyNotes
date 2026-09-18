@@ -1,17 +1,423 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="AskMyNotes — AI-powered study assistant that answers only from your uploaded notes with evidence-grounded responses." />
+  <meta name="description"
+    content="AskMyNotes — AI-powered study assistant that answers only from your uploaded notes with evidence-grounded responses." />
   <title>AskMyNotes — Study Copilot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-  <div id="app">
+
+  <!-- ════ Authentication Screen ════ -->
+  <div id="auth-container" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <span class="logo-icon">📚</span>
+          <h1>AskMyNotes</h1>
+        </div>
+        <p class="auth-subtitle">Evidence-grounded study copilot</p>
+      </div>
+
+      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+
+      <!-- Sign Up View -->
+      <form id="signup-form" class="auth-form" style="display: none;">
+        <h2 class="auth-title">Create Student Account</h2>
+        <p class="auth-desc">Answer questions strictly grounded in your study notes</p>
+
+        <div class="auth-field">
+          <label for="signup-name">Student Name</label>
+          <input type="text" id="signup-name" placeholder="e.g. Jane Doe" required autocomplete="name" />
+        </div>
+
+        <div class="auth-field">
+          <label for="signup-email">Email or Username</label>
+          <input type="text" id="signup-email" placeholder="student@university.edu" required autocomplete="username" />
+        </div>
+
+        <div class="auth-field">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="At least 6 characters" required
+            autocomplete="new-password" />
+        </div>
+
+        <div class="auth-field">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input type="password" id="signup-confirm-password" placeholder="Repeat your password" required
+            autocomplete="new-password" />
+        </div>
+
+        <button type="submit" id="signup-btn" class="btn btn-primary auth-btn">
+          <span>Sign Up</span>
+        </button>
+
+        <div class="auth-toggle">
+          <span>Already have an account?</span>
+          <button type="button" id="switch-to-login" class="auth-switch-link">Login</button>
+        </div>
+      </form>
+
+      <!-- Login View -->
+      <form id="login-form" class="auth-form">
+        <h2 class="auth-title">Student Login</h2>
+        <p class="auth-desc">Welcome back! Sign in to access your subjects and quizzes</p>
+
+        <div class="auth-field">
+          <label for="login-email">Email or Username</label>
+          <input type="text" id="login-email" placeholder="student@university.edu" required autocomplete="username" />
+        </div>
+
+        <div class="auth-field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="Enter your password" required
+            autocomplete="current-password" />
+        </div>
+
+        <button type="submit" id="login-btn" class="btn btn-primary auth-btn">
+          <span>Login</span>
+        </button>
+
+        <div class="auth-toggle">
+          <span>Don't have an account?</span>
+          <button type="button" id="switch-to-signup" class="auth-switch-link">Sign Up</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ═══════════════════════════════════════════════════════════════
+     STUDENT LANDING / HOME PAGE
+     ═══════════════════════════════════════════════════════════════ -->
+  <div id="home-container" class="home-container" style="display: none;">
+
+    <!-- Home Navigation -->
+    <header class="home-navbar">
+      <div class="home-brand">
+        <span class="home-brand-icon">📚</span>
+        <div>
+          <div class="home-brand-name">AskMyNotes</div>
+          <div class="home-brand-tagline">Evidence-grounded study copilot</div>
+        </div>
+      </div>
+
+      <nav class="home-nav-links">
+        <a href="#home-features" class="home-nav-link">Features</a>
+        <a href="#home-evidence" class="home-nav-link">Evidence</a>
+      </nav>
+
+      <div class="home-user-area">
+        <div class="home-user">
+          <span id="home-user-avatar" class="home-user-avatar">S</span>
+          <span id="home-user-name" class="home-user-name">Student</span>
+        </div>
+
+        <button id="home-dashboard-btn" class="home-dashboard-btn">
+          Dashboard →
+        </button>
+
+        <button id="home-logout-btn" class="home-logout-btn">
+          Logout
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Hero -->
+    <section class="home-hero">
+
+      <div class="home-hero-content">
+
+        <div class="home-welcome-pill">
+          <span>✦</span>
+          AI-powered learning from your own notes
+        </div>
+
+        <h1>
+          Welcome back,
+          <span id="home-hero-name">Student</span>.
+          <br />
+          <span class="home-gradient-text">Study smarter with your notes.</span>
+        </h1>
+
+        <p class="home-hero-description">
+          AskMyNotes is your evidence-grounded AI study companion.
+          Upload your study material, ask questions, understand difficult
+          concepts, and revise with answers based on your own notes.
+        </p>
+
+        <div class="home-hero-actions">
+          <button id="home-hero-dashboard-btn" class="home-primary-btn">
+            Open My Dashboard →
+          </button>
+
+          <button id="home-explore-btn" class="home-secondary-btn">
+            Explore Features
+          </button>
+        </div>
+
+        <div class="home-trust-line">
+          <span>✓ Your notes</span>
+          <span>✓ Evidence-grounded answers</span>
+          <span>✓ Source citations</span>
+        </div>
+
+      </div>
+
+
+      <!-- RAG Visual -->
+      <div class="home-hero-visual">
+
+        <div class="home-ai-card">
+
+          <div class="home-ai-card-header">
+            <div class="home-ai-dot"></div>
+            <span>AskMyNotes AI</span>
+            <span class="home-ai-status">Ready</span>
+          </div>
+
+          <div class="home-flow">
+
+            <div class="home-flow-card">
+              <div class="home-flow-icon">📄</div>
+              <div>
+                <strong>Your Notes</strong>
+                <span>PDF / TXT study material</span>
+              </div>
+            </div>
+
+            <div class="home-flow-line"></div>
+
+            <div class="home-flow-card">
+              <div class="home-flow-icon">🔎</div>
+              <div>
+                <strong>Relevant Evidence</strong>
+                <span>Find matching information</span>
+              </div>
+            </div>
+
+            <div class="home-flow-line"></div>
+
+            <div class="home-flow-card">
+              <div class="home-flow-icon">💡</div>
+              <div>
+                <strong>AI Answer</strong>
+                <span>Based on your material</span>
+              </div>
+            </div>
+
+            <div class="home-flow-line"></div>
+
+            <div class="home-flow-card">
+              <div class="home-flow-icon">📎</div>
+              <div>
+                <strong>Citations</strong>
+                <span>See where the answer came from</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Features -->
+    <section id="home-features" class="home-section">
+
+      <div class="home-section-heading">
+        <span class="home-section-label">STUDY WITH PURPOSE</span>
+        <h2>Everything you need to learn from your notes</h2>
+        <p>
+          One workspace for understanding, practicing, and tracking your learning.
+        </p>
+      </div>
+
+      <div class="home-feature-grid">
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon purple">💬</div>
+          <h3>Ask Your Notes</h3>
+          <p>
+            Ask questions about your uploaded study material and get answers
+            grounded in your resources.
+          </p>
+        </div>
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon blue">📎</div>
+          <h3>Evidence-Grounded Answers</h3>
+          <p>
+            View supporting evidence, citations, relevance scores, and
+            grounding information with your answers.
+          </p>
+        </div>
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon green">📝</div>
+          <h3>Study Mode</h3>
+          <p>
+            Generate practice questions from your study material and test
+            your understanding.
+          </p>
+        </div>
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon orange">✨</div>
+          <h3>Simplify Concepts</h3>
+          <p>
+            Convert difficult explanations into simpler language that is
+            easier to understand and revise.
+          </p>
+        </div>
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon pink">🎙</div>
+          <h3>Voice Interaction</h3>
+          <p>
+            Ask questions using voice and listen to answers using built-in
+            speech interaction.
+          </p>
+        </div>
+
+        <div class="home-feature-card">
+          <div class="home-feature-icon yellow">📊</div>
+          <h3>Study Analytics</h3>
+          <p>
+            Monitor your study activity, XP, streaks, quizzes, achievements,
+            and learning progress.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Evidence Section -->
+    <section id="home-evidence" class="home-evidence-section">
+
+      <div class="home-evidence-content">
+
+        <span class="home-section-label">BUILT AROUND YOUR MATERIAL</span>
+
+        <h2>
+          AI answers that stay connected
+          <span class="home-gradient-text">to your notes.</span>
+        </h2>
+
+        <p>
+          AskMyNotes is designed to answer questions using the study resources
+          you provide, while showing supporting evidence and citations.
+        </p>
+
+        <div class="home-evidence-points">
+
+          <div>
+            <span>01</span>
+            <div>
+              <strong>Upload your material</strong>
+              <p>Keep your study resources organized by subject.</p>
+            </div>
+          </div>
+
+          <div>
+            <span>02</span>
+            <div>
+              <strong>Ask questions</strong>
+              <p>Interact with your material through natural questions.</p>
+            </div>
+          </div>
+
+          <div>
+            <span>03</span>
+            <div>
+              <strong>See supporting evidence</strong>
+              <p>Review the evidence and citations behind the response.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="home-evidence-card">
+
+        <div class="evidence-card-top">
+          <span class="evidence-card-dot"></span>
+          <span>Evidence Grounding</span>
+        </div>
+
+        <div class="evidence-answer">
+          <span class="evidence-label">ANSWER</span>
+          <p>
+            Your answer is generated using relevant information
+            retrieved from your uploaded study material.
+          </p>
+        </div>
+
+        <div class="evidence-source">
+          <span>📄</span>
+          <div>
+            <strong>Source Evidence</strong>
+            <small>Your uploaded study material</small>
+          </div>
+        </div>
+
+        <div class="evidence-confidence">
+          <span>Grounded in your material</span>
+          <strong>✓</strong>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Final CTA -->
+    <section class="home-cta">
+
+      <div>
+        <span class="home-section-label">READY TO STUDY?</span>
+
+        <h2>
+          Your notes are waiting.
+        </h2>
+
+        <p>
+          Continue learning with your personalized AskMyNotes workspace.
+        </p>
+      </div>
+
+      <button id="home-cta-dashboard-btn" class="home-primary-btn">
+        Go to Dashboard →
+      </button>
+
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="home-footer">
+      <div>
+        <strong>📚 AskMyNotes</strong>
+        <span>Evidence-grounded study copilot</span>
+      </div>
+
+      <span>Learn from what you know.</span>
+    </footer>
+
+  </div>
+  <div id="app" style="display: none;">
     <!-- ── Top Bar ──────────────────────────────────── -->
     <header id="topbar">
       <div class="topbar-left">
@@ -33,7 +439,17 @@
         <div id="level-badge" class="gamification-badge level" title="Current level">
           <span id="level-text">Freshman</span>
         </div>
+
+        <div id="user-profile-badge" class="user-profile-badge" title="Active Student">
+          <span class="user-avatar" id="user-avatar-initial">S</span>
+          <span id="user-display-name" class="user-name">Student</span>
+          <button id="logout-btn" class="logout-btn" type="button" title="Sign out">Logout</button>
+        </div>
+
       </div>
+      <button id="dashboard-home-btn" class="dashboard-home-btn" type="button">
+        Home
+      </button>
     </header>
 
     <main id="main-layout">
@@ -132,7 +548,8 @@
           <div id="chat-messages" class="chat-messages">
             <div class="welcome-card">
               <h2>👋 Welcome to AskMyNotes</h2>
-              <p>Upload your notes and ask questions. I'll answer <strong>only</strong> from your materials — with citations, evidence, and honest confidence scores.</p>
+              <p>Upload your notes and ask questions. I'll answer <strong>only</strong> from your materials — with
+                citations, evidence, and honest confidence scores.</p>
               <div class="welcome-steps">
                 <div class="ws"><span>1</span> Create a subject</div>
                 <div class="ws"><span>2</span> Upload PDF/TXT notes</div>
@@ -203,7 +620,8 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2>🏅 Leaderboard</h2>
-          <button class="modal-close" onclick="document.getElementById('leaderboard-modal').style.display='none'">&times;</button>
+          <button class="modal-close"
+            onclick="document.getElementById('leaderboard-modal').style.display='none'">&times;</button>
         </div>
         <div id="leaderboard-body" class="leaderboard-body"></div>
       </div>
@@ -212,4 +630,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>

@@ -17,6 +17,7 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const FormData = require("form-data");
+const crypto = require("crypto");
 
 const app = express();
 const PORT = 3000;
@@ -51,6 +52,163 @@ const COLORS = ["#6C5CE7", "#00B894", "#E17055"];
 // ── Subject Endpoints ────────────────────────────────────────────────
 
 // Create subject
+
+// ─── Authentication & User Store ─────────────────────────────────────────
+const DATA_DIR = path.join(__dirname, "data");
+const USERS_FILE = path.join(DATA_DIR, "users.json");
+
+if (!fs.existsSync(DATA_DIR)) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+}
+
+function loadUsers() {
+  if (fs.existsSync(USERS_FILE)) {
+    try {
+      return JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
+    } catch (e) {
+      return [];
+    }
+  }
+  return [];
+}
+
+function saveUsers(users) {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
+}
+
+function hashPassword(password, salt) {
+  return crypto.scryptSync(password, salt, 64).toString("hex");
+}
+
+const activeSessions = new Map();
+
+// Student Sign Up
+app.post("/api/auth/signup", (req, res) => {
+  const { name, email, password } = req.body;
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: "Student name is required" });
+  }
+  if (!email || !email.trim()) {
+    return res.status(400).json({ error: "Student email/username is required" });
+  }
+  if (!password || password.length < 6) {
+    return res.status(400).json({ error: "Password must be at least 6 characters" });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const users = loadUsers();
+
+  if (users.some((u) => u.email.toLowerCase() === normalizedEmail)) {
+    return res.status(400).json({ error: "An account with this email/username already exists" });
+  }
+
+  const salt = crypto.randomBytes(16).toString("hex");
+  const passwordHash = hashPassword(password, salt);
+
+  const newUser = {
+    id: uuidv4(),
+    name: name.trim(),
+    email: normalizedEmail,
+    passwordHash,
+    salt,
+    createdAt: new Date().toISOString(),
+  };
+
+  users.push(newUser);
+  saveUsers(users);
+
+  const token = crypto.randomBytes(32).toString("hex");
+  activeSessions.set(token, {
+    userId: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+    createdAt: Date.now(),
+  });
+
+  res.json({
+    status: "success",
+    message: "Account created successfully",
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+    },
+    token,
+  });
+});
+
+// Student Login
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !email.trim() || !password) {
+    return res.status(400).json({ error: "Email/username and password are required" });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const users = loadUsers();
+  const user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
+
+  if (!user) {
+    return res.status(401).json({ error: "Invalid email/username or password" });
+  }
+
+  const computedHash = hashPassword(password, user.salt);
+  if (computedHash !== user.passwordHash) {
+    return res.status(401).json({ error: "Invalid email/username or password" });
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+  activeSessions.set(token, {
+    userId: user.id,
+    name: user.name,
+    email: user.email,
+    createdAt: Date.now(),
+  });
+
+  res.json({
+    status: "success",
+    message: "Logged in successfully",
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    },
+    token,
+  });
+});
+
+// Get Current Logged-in Student
+app.get("/api/auth/me", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized: Missing token" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  const session = activeSessions.get(token);
+  if (!session) {
+    return res.status(401).json({ error: "Session expired or invalid" });
+  }
+
+  res.json({
+    user: {
+      id: session.userId,
+      name: session.name,
+      email: session.email,
+    },
+  });
+});
+
+// Student Logout
+app.post("/api/auth/logout", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    activeSessions.delete(token);
+  }
+  res.json({ status: "success", message: "Logged out successfully" });
+});
+
 app.post("/api/subjects/create", (req, res) => {
   const { name } = req.body;
   if (!name || !name.trim()) {

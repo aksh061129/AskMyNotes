@@ -1002,11 +1002,392 @@ function escapeHtml(text) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════
+// AUTHENTICATION STATE & LOGIC
+// ══════════════════════════════════════════════════════════════════════════
+const AUTH_TOKEN_KEY = 'askmynotes_token';
+const AUTH_USER_KEY = 'askmynotes_user';
+
+function getAuthToken() {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+function getAuthUser() {
+    try {
+        const u = localStorage.getItem(AUTH_USER_KEY);
+        return u ? JSON.parse(u) : null;
+    } catch {
+        return null;
+    }
+}
+
+function setAuthSession(token, user) {
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+}
+
+function clearAuthSession() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+}
+
+function showAuthAlert(msg, type = 'error') {
+    const alertEl = document.getElementById('auth-alert');
+    if (!alertEl) return;
+    alertEl.textContent = msg;
+    alertEl.className = `auth-alert ${type}`;
+    alertEl.style.display = 'block';
+}
+
+function clearAuthAlert() {
+    const alertEl = document.getElementById('auth-alert');
+    if (!alertEl) return;
+    alertEl.textContent = '';
+    alertEl.style.display = 'none';
+}
+
+function switchAuthMode(mode) {
+    clearAuthAlert();
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    if (!signupForm || !loginForm) return;
+
+    if (mode === 'signup') {
+        signupForm.style.display = 'block';
+        loginForm.style.display = 'none';
+    } else {
+        loginForm.style.display = 'block';
+        signupForm.style.display = 'none';
+    }
+}
+
+function showHome(user) {
+    const authEl = document.getElementById('auth-container');
+    const homeEl = document.getElementById('home-container');
+    const appEl = document.getElementById('app');
+
+    if (authEl) authEl.style.display = 'none';
+    if (appEl) appEl.style.display = 'none';
+    if (homeEl) homeEl.style.display = 'block';
+
+    const studentName = user?.name || 'Student';
+    const initial = studentName.charAt(0).toUpperCase();
+
+    const homeName = document.getElementById('home-user-name');
+    const homeHeroName = document.getElementById('home-hero-name');
+    const homeAvatar = document.getElementById('home-user-avatar');
+
+    if (homeName) homeName.textContent = studentName;
+    if (homeHeroName) homeHeroName.textContent = studentName;
+    if (homeAvatar) homeAvatar.textContent = initial;
+}
+
+function showHome(user) {
+    const authEl = document.getElementById('auth-container');
+    const homeEl = document.getElementById('home-container');
+    const appEl = document.getElementById('app');
+
+    if (authEl) authEl.style.display = 'none';
+    if (appEl) appEl.style.display = 'none';
+    if (homeEl) homeEl.style.display = 'block';
+
+    const studentName = user?.name || 'Student';
+    const initial = studentName.charAt(0).toUpperCase();
+
+    const homeName = document.getElementById('home-user-name');
+    const homeHeroName = document.getElementById('home-hero-name');
+    const homeAvatar = document.getElementById('home-user-avatar');
+
+    if (homeName) homeName.textContent = studentName;
+    if (homeHeroName) homeHeroName.textContent = studentName;
+    if (homeAvatar) homeAvatar.textContent = initial;
+}
+function showDashboard(user) {
+    const authEl = document.getElementById('auth-container');
+    const homeEl = document.getElementById('home-container');
+    const appEl = document.getElementById('app');
+
+    if (authEl) authEl.style.display = 'none';
+    if (homeEl) homeEl.style.display = 'none';
+    if (appEl) appEl.style.display = 'flex';
+
+    const studentName = user?.name || 'Student';
+    const initial = studentName.charAt(0).toUpperCase();
+
+    const nameEl = document.getElementById('user-display-name');
+    const avatarEl = document.getElementById('user-avatar-initial');
+
+    if (nameEl) nameEl.textContent = studentName;
+    if (avatarEl) avatarEl.textContent = initial;
+
+    // Load subjects
+    loadSubjects();
+}
+
+function showAuth(mode = 'login') {
+    const authEl = document.getElementById('auth-container');
+    const homeEl = document.getElementById('home-container');
+    const appEl = document.getElementById('app');
+
+    if (appEl) appEl.style.display = 'none';
+    if (homeEl) homeEl.style.display = 'none';
+    if (authEl) authEl.style.display = 'flex';
+
+    switchAuthMode(mode);
+}
+function setupAuth() {
+    const switchLoginBtn = document.getElementById('switch-to-login');
+    const switchSignupBtn = document.getElementById('switch-to-signup');
+
+    if (switchLoginBtn) {
+        switchLoginBtn.addEventListener('click', () => switchAuthMode('login'));
+    }
+
+    if (switchSignupBtn) {
+        switchSignupBtn.addEventListener('click', () => switchAuthMode('signup'));
+    }
+
+    // ── Sign Up ────────────────────────────────────────────────
+
+    const signupForm = document.getElementById('signup-form');
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAuthAlert();
+
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+            if (!name || !email || !password) {
+                showAuthAlert('Please fill in all required fields.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAuthAlert('Password must be at least 6 characters.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showAuthAlert('Passwords do not match. Please verify.');
+                return;
+            }
+
+            const btn = document.getElementById('signup-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>Creating account...</span>';
+
+            try {
+                const res = await fetch(`${API}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Failed to sign up');
+                }
+
+                // Signup only creates the account.
+                // User must login before entering Home.
+                clearAuthSession();
+                switchAuthMode('login');
+
+                showAuthAlert(
+                    'Account created successfully. Please login to continue.',
+                    'success'
+                );
+
+                const loginEmail = document.getElementById('login-email');
+
+                if (loginEmail) {
+                    loginEmail.value = email;
+                }
+
+            } catch (err) {
+                showAuthAlert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Sign Up</span>';
+            }
+        });
+    }
+
+    // ── Login ──────────────────────────────────────────────────
+
+    const loginForm = document.getElementById('login-form');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAuthAlert();
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!email || !password) {
+                showAuthAlert('Please enter your email/username and password.');
+                return;
+            }
+
+            const btn = document.getElementById('login-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span>Signing in...</span>';
+
+            try {
+                const res = await fetch(`${API}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Invalid credentials');
+                }
+
+                // Save authenticated user
+                setAuthSession(data.token, data.user);
+
+                // Login → Home
+                showHome(data.user);
+
+            } catch (err) {
+                showAuthAlert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Login</span>';
+            }
+        });
+    }
+
+    // ── Dashboard Logout ───────────────────────────────────────
+
+    const logoutBtn = document.getElementById('logout-btn');
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async () => {
+            const token = getAuthToken();
+
+            if (token) {
+                try {
+                    await fetch(`${API}/api/auth/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                } catch {
+                    // Non-fatal
+                }
+            }
+
+            clearAuthSession();
+            showAuth('login');
+        });
+    }
+
+    // ── Home Page → Dashboard ─────────────────────────────────
+
+    const homeDashboardButtons = [
+        document.getElementById('home-dashboard-btn'),
+        document.getElementById('home-hero-dashboard-btn'),
+        document.getElementById('home-cta-dashboard-btn')
+    ];
+
+    homeDashboardButtons.forEach(btn => {
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const user = getAuthUser();
+
+                if (user && getAuthToken()) {
+                    showDashboard(user);
+                } else {
+                    showAuth('login');
+                }
+            });
+        }
+    });
+
+    // ── Explore Features ──────────────────────────────────────
+
+    const exploreBtn = document.getElementById('home-explore-btn');
+
+    if (exploreBtn) {
+        exploreBtn.addEventListener('click', () => {
+            document.getElementById('home-features')?.scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // ── Dashboard → Home ──────────────────────────────────────
+
+    const dashboardHomeBtn = document.getElementById('dashboard-home-btn');
+
+    if (dashboardHomeBtn) {
+        dashboardHomeBtn.addEventListener('click', () => {
+            const user = getAuthUser();
+
+            if (user && getAuthToken()) {
+                showHome(user);
+            } else {
+                showAuth('login');
+            }
+        });
+    }
+
+    // ── Home Logout ────────────────────────────────────────────
+
+    const homeLogoutBtn = document.getElementById('home-logout-btn');
+
+    if (homeLogoutBtn) {
+        homeLogoutBtn.addEventListener('click', async () => {
+            const token = getAuthToken();
+
+            if (token) {
+                try {
+                    await fetch(`${API}/api/auth/logout`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                } catch {
+                    // Non-fatal
+                }
+            }
+
+            clearAuthSession();
+            showAuth('login');
+        });
+    }
+}
+
 // INIT
 // ═══════════════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-    // Load subjects
-    loadSubjects();
+    // 1. Initialize authentication handlers
+    setupAuth();
+
+    // 2. Check if student already has an active session
+    const token = getAuthToken();
+    const user = getAuthUser();
+
+    if (token && user) {
+        // Existing authenticated student -> Home page
+        showHome(user);
+    } else {
+        // Not authenticated -> Login
+        showAuth('login');
+    }
 
     // Setup modules
     setupUpload();
