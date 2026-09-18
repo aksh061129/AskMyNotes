@@ -13,7 +13,7 @@ DATA_DIR.mkdir(exist_ok=True)
 
 # ── Groq LLM ──────────────────────────────────────────────────────────
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 LLM_TEMPERATURE = 0.1          # Low temp → deterministic answers
 
 # ── Embedding Model (local) ───────────────────────────────────────────

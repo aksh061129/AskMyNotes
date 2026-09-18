@@ -2512,3 +2512,38 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ── RAG Evidence Snippets ─────────────────────────────────────────── */
+
+.evidence-section {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.evidence-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.evidence-snippet {
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: #ffffff !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-left: 3px solid var(--accent-purple) !important;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.evidence-snippet:last-child {
+  margin-bottom: 0;
+}

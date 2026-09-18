@@ -56,18 +56,37 @@ Respond in valid JSON format ONLY (no markdown, no code fences):
   "answer_found": true,
   "grounding_percentage": 95
 }}"""
-
     try:
+        print("[DEBUG] Calling Groq LLM...")
+
         response = llm.complete(prompt)
+
+        print("[DEBUG] Groq response received")
+
         text = response.text.strip()
-        # Try to extract JSON from the response
+
+        print("\n" + "=" * 70)
+        print("[LLM RAW RESPONSE]")
+        print(text)
+        print("=" * 70 + "\n")
+
         if text.startswith("```"):
             lines = text.split("\n")
             text = "\n".join(lines[1:-1])
+
         parsed = json.loads(text)
+
+        print("[DEBUG] JSON parsed successfully")
+
         return parsed
-    except (json.JSONDecodeError, Exception) as e:
-        # Graceful degradation: return evidence-only response
+
+    except Exception as e:
+        print("\n" + "=" * 70)
+        print("[LLM ERROR]")
+        print(f"Exception type: {type(e).__name__}")
+        print(f"Exception message: {str(e)}")
+        print("=" * 70 + "\n")
+
         return {
             "answer": "I found relevant evidence in your notes but could not generate a full answer. Please review the evidence snippets below.",
             "answer_found": True,
