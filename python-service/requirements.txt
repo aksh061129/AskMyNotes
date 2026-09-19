@@ -19,3 +19,4 @@ textstat==0.7.4
 
 # Env
 python-dotenv==1.0.1
+python-docx
