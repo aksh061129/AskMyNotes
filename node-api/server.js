@@ -35,10 +35,24 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if ([".pdf", ".txt", ".text"].includes(ext)) {
+
+    if ([
+      ".pdf",
+      ".txt",
+      ".text",
+      ".docx",
+      ".pptx",
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".webp",
+      ".zip"
+    ].includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error("Only PDF and TXT files are supported"));
+      cb(new Error(
+        "Supported files: PDF, TXT, DOCX, PPTX, PNG, JPG, JPEG, WEBP, ZIP"
+      ));
     }
   },
 });
@@ -286,7 +300,7 @@ app.post("/api/upload/:subjectId", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: msg });
   } finally {
     // Clean up temp file
-    fs.unlink(req.file.path, () => {});
+    fs.unlink(req.file.path, () => { });
   }
 });
 

@@ -472,10 +472,10 @@
         <section class="sidebar-section" id="upload-section" style="display: none;">
           <h2 class="section-title"><span>📄</span> Upload Notes</h2>
           <div id="upload-zone" class="upload-zone">
-            <input type="file" id="file-input" accept=".pdf,.txt,.text" hidden />
+            <input type="file" id="file-input" accept=".pdf,.txt,.text,.docx,.pptx,.png,.jpg,.jpeg,.webp,.zip">
             <div class="upload-content" id="upload-content">
               <span class="upload-icon">📤</span>
-              <p>Drop PDF/TXT here or <strong>click to browse</strong></p>
+              <p>Drop PDF/TXT/DOCX/PPTX/Images/ZIP here or <strong>click to browse</strong></p>
             </div>
             <!-- Animated pipeline -->
             <div id="ingest-pipeline" class="ingest-pipeline" style="display: none;">
@@ -547,12 +547,11 @@
         <div id="chat-view" class="view active">
           <div id="chat-messages" class="chat-messages">
             <div class="welcome-card">
-              <h2>👋 Welcome to AskMyNotes</h2>
               <p>Upload your notes and ask questions. I'll answer <strong>only</strong> from your materials — with
                 citations, evidence, and honest confidence scores.</p>
               <div class="welcome-steps">
                 <div class="ws"><span>1</span> Create a subject</div>
-                <div class="ws"><span>2</span> Upload PDF/TXT notes</div>
+                <div class="ws"><span>2</span> Upload notes</div>
                 <div class="ws"><span>3</span> Ask anything</div>
               </div>
             </div>

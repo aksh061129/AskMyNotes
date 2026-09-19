@@ -1,5 +1,7 @@
 """FastAPI entrypoint for the AskMyNotes Python RAG service."""
 
+from PIL import ExifTags
+from PIL import ExifTags
 import os
 import shutil
 import tempfile
@@ -40,12 +42,13 @@ async def ingest(
     file: UploadFile = File(...),
     subject_id: str = Form(...),
 ):
-    """Ingest a document (PDF or TXT) into a subject's FAISS index."""
+    """Ingest a supported document into a subject's FAISS index."""    
     ext = Path(file.filename).suffix.lower()
-    if ext not in (".pdf", ".txt", ".text"):
-        raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
-
-    # Save to temp file
+    if ext not in (
+        ".pdf", ".txt", ".text", ".docx", ".pptx",
+        ".png", ".jpg", ".jpeg", ".webp", ".zip"
+    ):
+            raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")    # Save to temp file
     tmp_dir = tempfile.mkdtemp()
     tmp_path = os.path.join(tmp_dir, file.filename)
     try:

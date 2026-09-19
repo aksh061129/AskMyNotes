@@ -1378,16 +1378,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupAuth();
 
     // 2. Check if student already has an active session
-    const token = getAuthToken();
-    const user = getAuthUser();
-
-    if (token && user) {
-        // Existing authenticated student -> Home page
-        showHome(user);
-    } else {
-        // Not authenticated -> Login
-        showAuth('login');
-    }
+    clearAuthSession();
+    showAuth('login');
 
     // Setup modules
     setupUpload();

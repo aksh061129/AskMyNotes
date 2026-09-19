@@ -5,6 +5,15 @@ import fitz  # PyMuPDF
 import faiss
 import numpy as np
 from pathlib import Path
+from docx import Document
+from pptx import Presentation
+from PIL import Image
+import pytesseract
+import zipfile
+import tempfile
+import os
+
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 from config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
 from embedder import embedder
@@ -74,6 +83,130 @@ def _parse_txt(file_path: str) -> list[dict]:
     }]
 
 
+def _parse_docx(file_path: str) -> list[dict]:
+    """Parse DOCX/Word document → list of text entries."""
+    doc = Document(file_path)
+    pages = []
+    filename = Path(file_path).name
+
+    # Extract normal paragraphs
+    for paragraph_index, paragraph in enumerate(doc.paragraphs, start=1):
+        text = paragraph.text.strip()
+        if text:
+            pages.append({
+                "text": text,
+                "page": None,
+                "filename": filename,
+            })
+
+    # Extract tables
+    for table_index, table in enumerate(doc.tables, start=1):
+        rows = []
+        for row in table.rows:
+            cells = [cell.text.strip() for cell in row.cells]
+            row_text = " | ".join(cell for cell in cells if cell)
+            if row_text:
+                rows.append(row_text)
+
+        if rows:
+            pages.append({
+                "text": "\n".join(rows),
+                "page": None,
+                "filename": filename,
+            })
+
+    return pages
+
+
+def _parse_pptx(file_path: str) -> list[dict]:
+    """Parse PPTX/PowerPoint presentation into text entries."""
+    presentation = Presentation(file_path)
+    slides = []
+    filename = Path(file_path).name
+
+    for slide_number, slide in enumerate(presentation.slides, start=1):
+        texts = []
+        for shape in slide.shapes:
+            if hasattr(shape, "text"):
+                text = shape.text.strip()
+                if text:
+                    texts.append(text)
+
+        if texts:
+            slides.append({
+                "text": "\n".join(texts),
+                "page": slide_number,
+                "filename": filename,
+            })
+
+    return slides
+
+
+def _parse_image(file_path: str) -> list[dict]:
+    """Parse image (PNG, JPG, JPEG, WEBP) using pytesseract OCR → single entry."""
+    image = Image.open(file_path)
+    text = pytesseract.image_to_string(image).strip()
+    if not text:
+        return []
+    return [{
+        "text": text,
+        "page": 1,
+        "filename": Path(file_path).name,
+    }]
+
+def _parse_supported_file(file_path: str) -> list[dict]:
+    """Parse one supported file using the existing parsers."""
+    ext = Path(file_path).suffix.lower()
+
+    if ext == ".pdf":
+        return _parse_pdf(file_path)
+    elif ext in (".txt", ".text"):
+        return _parse_txt(file_path)
+    elif ext == ".docx":
+        return _parse_docx(file_path)
+    elif ext == ".pptx":
+        return _parse_pptx(file_path)
+    elif ext in (".png", ".jpg", ".jpeg", ".webp"):
+        return _parse_image(file_path)
+    else:
+        return []
+def _parse_zip(file_path: str) -> list[dict]:
+    """Extract and parse supported files from a ZIP archive."""
+    supported_extensions = {
+        ".pdf",
+        ".txt",
+        ".text",
+        ".docx",
+        ".pptx",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+    }
+
+    entries = []
+
+    with tempfile.TemporaryDirectory() as extract_dir:
+        with zipfile.ZipFile(file_path, "r") as zip_ref:
+            zip_ref.extractall(extract_dir)
+
+        for root, _, files in os.walk(extract_dir):
+            for filename in files:
+                ext = Path(filename).suffix.lower()
+
+                if ext not in supported_extensions:
+                    continue
+
+                extracted_path = os.path.join(root, filename)
+
+                try:
+                    parsed = _parse_supported_file(extracted_path)
+                    entries.extend(parsed)
+                except Exception as e:
+                    print(f"Skipping {filename}: {e}")
+
+    return entries
+
 # ── Chunking ──────────────────────────────────────────────────────────
 
 def _chunk_documents(pages: list[dict]) -> list[dict]:
@@ -103,10 +236,19 @@ def ingest_document(subject_id: str, file_path: str) -> dict:
     Returns summary dict with chunk count and status.
     """
     ext = Path(file_path).suffix.lower()
+
     if ext == ".pdf":
         pages = _parse_pdf(file_path)
     elif ext in (".txt", ".text"):
         pages = _parse_txt(file_path)
+    elif ext == ".docx":
+        pages = _parse_docx(file_path)
+    elif ext == ".pptx":
+        pages = _parse_pptx(file_path)
+    elif ext == ".zip":
+        pages = _parse_pptx(file_path)
+    elif ext in (".png", ".jpg", ".jpeg", ".webp", ".zip"):
+        pages = _parse_image(file_path)
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
