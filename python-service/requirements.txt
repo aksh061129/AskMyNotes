@@ -13,6 +13,8 @@ sentence-transformers==3.3.1
 
 # Document parsing
 PyMuPDF==1.25.1
+python-docx
+python-pptx
 
 # Readability
 textstat==0.7.4
@@ -20,3 +22,11 @@ textstat==0.7.4
 # Env
 python-dotenv==1.0.1
 python-docx
+
+
+# cd C:\Github\AskMyNotes-Team_Rocket\python-service
+# .\venv\Scripts\Activate.ps1
+# python -m uvicorn main:app --reload --port 8000
+
+# cd C:\Github\AskMyNotes-Team_Rocket\node-api
+# node server.js

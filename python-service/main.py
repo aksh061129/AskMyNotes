@@ -1,5 +1,6 @@
 """FastAPI entrypoint for the AskMyNotes Python RAG service."""
 
+from starlette import requests
 from PIL import ExifTags
 from PIL import ExifTags
 import os
@@ -17,6 +18,10 @@ from query_engine import query as run_query
 from study_engine import generate_study_questions
 from simplify_engine import simplify_answer
 
+from fastapi import UploadFile, File
+from handwriting_engine import transcribe_handwriting
+from pydantic import BaseModel
+
 app = FastAPI(title="AskMyNotes RAG Service", version="1.0.0")
 
 # CORS — allow Node.js API layer
@@ -26,7 +31,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+class HandwritingIngestRequest(BaseModel):
+    subject_id: str
+    filename: str
+    text: str
 
 # ── Health ────────────────────────────────────────────────────────────
 
@@ -93,6 +101,7 @@ def query_endpoint(req: QueryRequest):
 class StudyRequest(BaseModel):
     subject_id: str
     subject_name: str
+    selected_filename: str | None = None
 
 
 @app.post("/py/study")
@@ -102,11 +111,11 @@ def study_endpoint(req: StudyRequest):
         result = generate_study_questions(
             subject_id=req.subject_id,
             subject_name=req.subject_name,
+            selected_filename=req.selected_filename,
         )
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # ── Simplify ──────────────────────────────────────────────────────────
 
@@ -154,7 +163,74 @@ def delete_subject(subject_id: str):
         return {"status": "deleted", "subject_id": subject_id}
     return {"status": "not_found", "subject_id": subject_id}
 
+@app.post("/py/handwriting")
+async def handwriting_endpoint(file: UploadFile = File(...)):
+    try:
+        image_bytes = await file.read()
 
+        temp_path = f"temp_{file.filename}"
+
+        with open(temp_path, "wb") as f:
+            f.write(image_bytes)
+
+        text = transcribe_handwriting(temp_path)
+
+        import os
+        os.remove(temp_path)
+
+        return {
+            "filename": file.filename,
+            "text": text
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/py/handwriting/add")
+def add_handwriting(req: HandwritingIngestRequest):
+    import os
+    import tempfile
+
+    try:
+        if not req.text.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Handwritten content is empty."
+            )
+
+        # Create a temporary TXT file from the edited handwriting
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_file = os.path.join(
+                temp_dir,
+                "handwritten_notes.txt"
+            )
+
+            with open(temp_file, "w", encoding="utf-8") as f:
+                f.write(req.text)
+
+            # Use the existing RAG ingestion pipeline
+            result = ingest_document(
+                subject_id=req.subject_id,
+                file_path=temp_file
+            )
+
+        return {
+            "success": True,
+            "filename": "handwritten_notes.txt",
+            "subject_id": req.subject_id,
+            "chunks_added": result.get("chunks_added", 0),
+            "total_chunks": result.get("total_chunks", 0),
+            "status": result.get("status")
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+        
+        
 # ── Run ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":

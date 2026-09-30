@@ -71,7 +71,8 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -2546,4 +2547,695 @@ body {
 
 .evidence-snippet:last-child {
   margin-bottom: 0;
+}
+
+
+/* =========================================================
+   STUDY PAGE
+   ========================================================= */
+
+#study-view {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#study-view .study-page {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+
+  padding: 34px 42px 50px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+
+/* ---------------------------------------------------------
+   STUDY HEADER
+   --------------------------------------------------------- */
+
+#study-view .study-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+#study-view .study-header h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #172033;
+}
+
+#study-view .study-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #61708a;
+}
+
+
+/* ---------------------------------------------------------
+   STUDY OPTIONS
+   --------------------------------------------------------- */
+
+#study-view .study-options {
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto 22px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+
+/* Individual Quiz / Flashcard card */
+
+#study-view .study-option-card {
+  width: 100%;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #e5e9f2;
+  border-radius: 16px;
+
+  padding: 24px 26px;
+
+  box-shadow: 0 4px 16px rgba(54, 64, 100, 0.06);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+#study-view .study-option-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 22px rgba(54, 64, 100, 0.09);
+
+  border-color: #d9d4ff;
+}
+
+
+/* Content inside option */
+
+#study-view .study-option-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+
+/* Icon */
+
+#study-view .study-option-icon {
+  width: 52px;
+  height: 52px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  font-size: 25px;
+}
+
+#study-view .quiz-icon {
+  background: #f0edff;
+}
+
+#study-view .flashcard-icon {
+  background: #eef7ff;
+}
+
+
+/* Option content */
+
+#study-view .study-option-content {
+  flex: 1;
+  min-width: 0;
+}
+
+#study-view .study-option-content h3 {
+  margin: 0 0 6px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #172033;
+}
+
+#study-view .study-option-content p {
+  margin: 0 0 16px;
+
+  max-width: 700px;
+
+  font-size: 14px;
+  line-height: 1.55;
+
+  color: #66738a;
+}
+
+
+/* Buttons */
+
+#study-view .study-action-btn {
+  min-width: 145px;
+}
+
+
+/* ---------------------------------------------------------
+   STUDY MATERIAL SUMMARY
+   --------------------------------------------------------- */
+
+#study-view .study-material-info {
+  width: 100%;
+  max-width: 950px;
+
+  margin: 0 auto 24px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  padding: 18px 20px;
+
+  background: #f8f9fc;
+
+  border: 1px solid #e8ebf2;
+  border-radius: 14px;
+}
+
+#study-view .study-material-icon {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  font-size: 21px;
+}
+
+#study-view .study-material-text {
+  min-width: 0;
+}
+
+#study-view .study-material-text h3 {
+  margin: 0 0 3px;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  color: #263247;
+}
+
+#study-view .study-material-text p {
+  margin: 0;
+
+  font-size: 13px;
+  color: #718096;
+}
+
+
+/* ---------------------------------------------------------
+   QUIZ / FLASHCARD CONTENT SECTIONS
+   --------------------------------------------------------- */
+
+#study-view .study-content-section {
+  width: 100%;
+  max-width: 950px;
+
+  margin: 0 auto 30px;
+
+  box-sizing: border-box;
+}
+
+#study-view .study-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 16px;
+}
+
+#study-view .study-section-header h3 {
+  margin: 0 0 4px;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  color: #172033;
+}
+
+#study-view .study-section-header p {
+  margin: 0;
+
+  font-size: 13px;
+  color: #718096;
+}
+
+
+/* ---------------------------------------------------------
+   FLASHCARD
+   --------------------------------------------------------- */
+
+#study-view .flashcard {
+  width: 100%;
+  min-height: 360px;
+
+  perspective: 1000px;
+
+  cursor: pointer;
+}
+
+#study-view .flashcard-inner {
+  position: relative;
+
+  width: 100%;
+  height: 360px;
+
+  transform-style: preserve-3d;
+
+  transition: transform 0.5s ease;
+}
+
+#study-view .flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+#study-view .flashcard-front,
+#study-view .flashcard-back {
+  position: absolute;
+
+  inset: 0;
+
+  box-sizing: border-box;
+
+  padding: 45px;
+
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #e4e8f1;
+
+  box-shadow: 0 8px 24px rgba(54, 64, 100, 0.08);
+
+  backface-visibility: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+#study-view .flashcard-back {
+  transform: rotateY(180deg);
+}
+
+#study-view .flashcard-label {
+  margin-bottom: 18px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  color: #7161e8;
+}
+
+#study-view .flashcard-front h3 {
+  max-width: 750px;
+
+  margin: 0;
+
+  font-size: 24px;
+  line-height: 1.45;
+
+  color: #172033;
+}
+
+#study-view .flashcard-back p {
+  max-width: 750px;
+
+  margin: 0;
+
+  font-size: 17px;
+  line-height: 1.65;
+
+  color: #334155;
+}
+
+#study-view .flashcard-hint {
+  margin-top: 22px;
+
+  font-size: 13px;
+
+  color: #8a94a6;
+}
+
+#study-view .flashcard-source {
+  margin-top: 24px;
+
+  font-size: 12px;
+  color: #718096;
+}
+
+
+/* ---------------------------------------------------------
+   FLASHCARD CONTROLS
+   --------------------------------------------------------- */
+
+#study-view .flashcard-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+
+  margin-top: 18px;
+}
+
+#study-view .flashcard-count {
+  padding: 6px 11px;
+
+  border-radius: 20px;
+
+  background: #f0edff;
+
+  color: #6656d9;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------
+   SCROLLBAR
+   --------------------------------------------------------- */
+
+#study-view .study-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+#study-view .study-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#study-view .study-page::-webkit-scrollbar-thumb {
+  background: #cfd4df;
+  border-radius: 10px;
+}
+
+#study-view .study-page::-webkit-scrollbar-thumb:hover {
+  background: #b8bfce;
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE / SMALL SCREEN
+   --------------------------------------------------------- */
+
+@media (max-width: 800px) {
+
+  #study-view .study-page {
+    padding: 25px 18px 40px;
+  }
+
+  #study-view .study-option-card {
+    padding: 20px;
+  }
+
+  #study-view .study-option-main {
+    gap: 14px;
+  }
+
+  #study-view .study-option-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 21px;
+  }
+
+  #study-view .flashcard-front,
+  #study-view .flashcard-back {
+    padding: 28px 20px;
+  }
+
+  #study-view .flashcard-front h3 {
+    font-size: 20px;
+  }
+
+  #study-view .flashcard-inner {
+    height: 320px;
+  }
+
+  #study-view .flashcard {
+    min-height: 320px;
+  }
+}
+
+
+.flashcard {
+  width: 100%;
+  max-width: 700px;
+  height: 320px;
+  margin: 20px auto;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 30px;
+  box-sizing: border-box;
+
+  border-radius: 16px;
+  background: white;
+  border: 1px solid #dbe4f0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+
+  text-align: center;
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+.flashcard-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #64748b;
+}
+
+.flashcard-text {
+  font-size: 22px;
+  line-height: 1.5;
+  color: #1e293b;
+}
+
+.flashcard-hint {
+  margin-top: 25px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.flashcard-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.flashcard-controls button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #dbe4f0;
+  background: white;
+  cursor: pointer;
+}
+
+.flashcard-controls button:hover {
+  background: #f8fafc;
+}
+
+.flashcard-loading,
+.flashcard-error,
+.flashcard-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: #64748b;
+}
+
+/* ================================
+   Handwritten Notes
+================================ */
+
+.handwriting-section {
+  margin-top: 24px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #dbe7f3;
+  border-radius: 12px;
+}
+
+.handwriting-section h3 {
+  margin: 0 0 18px;
+  color: #1e3a5f;
+  font-size: 20px;
+}
+
+/* File input */
+#handwriting-file {
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 10px;
+  border: 1px solid #cbd9e8;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #334155;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Transcribe button */
+#transcribe-handwriting-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #6656d9;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+#transcribe-handwriting-btn:hover {
+  background: #9087d6;
+}
+
+#transcribe-handwriting-btn:active {
+  transform: translateY(1px);
+}
+
+/* Result message */
+#handwriting-result {
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Extracted content editor */
+#handwriting-editor {
+  margin-top: 20px;
+}
+
+#handwriting-editor h4 {
+  margin: 0 0 10px;
+  color: #1e3a5f;
+  font-size: 16px;
+}
+
+/* Textarea */
+#handwriting-text {
+  width: 100%;
+  min-height: 260px;
+  padding: 14px;
+  box-sizing: border-box;
+  resize: vertical;
+
+  border: 1px solid #cbd9e8;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #1e293b;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  outline: none;
+}
+
+#handwriting-text:focus {
+  border-color: #6656d9;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* Buttons inside editor */
+#handwriting-editor>div {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Add to My Notes */
+#add-handwriting-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #6656d9;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#add-handwriting-btn:hover {
+  background: #6656d9;
+}
+
+/* Cancel */
+#cancel-handwriting-btn {
+  padding: 10px 18px;
+  border: 1px solid #cbd9e8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#cancel-handwriting-btn:hover {
+  background: #f1f5f9;
 }

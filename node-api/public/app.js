@@ -8,16 +8,32 @@ const API = '';  // Same origin
 // ═══════════════════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════════════════
+// const state = {
+//     subjects: [],
+//     activeSubjectId: null,
+//     uploadedFiles: [],
+
 const state = {
     subjects: [],
     activeSubjectId: null,
-    uploadedFiles: {},       // subjectId → [{ filename, chunks }]
+    uploadedFiles: {},
+
+    // Document selected for quiz/study generation
+    selectedQuizFile: null,
+
+    // Quiz
     quizData: null,
     quizAnswers: {},
     quizRevealed: false,
+
+    // Flashcards
+    flashcards: [],
+    flashcardIndex: 0,
+    flashcardFlipped: false,
+
     isListening: false,
     isSpeaking: false,
-    lastAnswer: null,        // for simplify
+    lastAnswer: null,
     pomodoroInterval: null,
     pomodoroSeconds: 25 * 60,
     pomodoroRunning: false,
@@ -171,51 +187,608 @@ function updateGamificationUI() {
 // ANALYTICS
 // ═══════════════════════════════════════════════════════════════════════
 function updateAnalytics(g) {
-    // Subject progress
+    // ═══════════════════════════════════════════════════════════════
+    // SUBJECT COVERAGE
+    // ═══════════════════════════════════════════════════════════════
     const progressEl = document.getElementById('subject-progress');
     progressEl.innerHTML = '';
-    for (const s of state.subjects) {
-        const files = state.uploadedFiles[s.id] || [];
-        const totalChunks = files.reduce((sum, f) => sum + (f.chunks || 0), 0);
-        const item = document.createElement('div');
-        item.className = 'progress-item';
-        item.innerHTML = `
-      <span class="progress-item-label">${s.name}</span>
-      <div class="progress-item-bar">
-        <div class="progress-item-fill" style="width: ${Math.min(100, totalChunks * 2)}%; background: ${s.color};"></div>
-      </div>
-      <span style="font-size:11px;color:var(--text-muted)">${totalChunks} chunks</span>
-    `;
-        progressEl.appendChild(item);
+
+    if (state.subjects.length === 0) {
+        progressEl.innerHTML = `
+            <div style="text-align:center;color:var(--text-muted);padding:25px 10px;">
+                <div style="font-size:28px;margin-bottom:8px;">📚</div>
+                <div>No subjects created yet.</div>
+                <div style="font-size:12px;margin-top:4px;">
+                    Create a subject and upload notes to start tracking progress.
+                </div>
+            </div>
+        `;
+    } else {
+        const subjectStats = state.subjects.map(s => {
+            const files = state.uploadedFiles[s.id] || [];
+            const totalChunks = files.reduce(
+                (sum, f) => sum + (f.chunks || 0),
+                0
+            );
+
+            return {
+                subject: s,
+                files,
+                totalChunks
+            };
+        });
+
+        const maxChunks = Math.max(
+            1,
+            ...subjectStats.map(x => x.totalChunks)
+        );
+
+        for (const itemData of subjectStats) {
+            const s = itemData.subject;
+            const files = itemData.files;
+            const totalChunks = itemData.totalChunks;
+
+            const coverage = Math.round(
+                (totalChunks / maxChunks) * 100
+            );
+
+            const item = document.createElement('div');
+            item.className = 'progress-item';
+
+            item.innerHTML = `
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:5px;
+                ">
+                    <span class="progress-item-label">
+                        ${s.name}
+                    </span>
+
+                    <span style="
+                        font-size:11px;
+                        color:var(--text-muted);
+                    ">
+                        ${files.length} file${files.length !== 1 ? 's' : ''}
+                    </span>
+                </div>
+
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    gap:10px;
+                ">
+                    <div class="progress-item-bar" style="flex:1;">
+                        <div
+                            class="progress-item-fill"
+                            style="
+                                width:${coverage}%;
+                                background:${s.color};
+                            ">
+                        </div>
+                    </div>
+
+                    <span style="
+                        font-size:11px;
+                        color:var(--text-muted);
+                        min-width:65px;
+                        text-align:right;
+                    ">
+                        ${totalChunks} sections
+                    </span>
+                </div>
+            `;
+
+            progressEl.appendChild(item);
+        }
+
+        const totalFiles = subjectStats.reduce(
+            (sum, x) => sum + x.files.length,
+            0
+        );
+
+        const totalChunks = subjectStats.reduce(
+            (sum, x) => sum + x.totalChunks,
+            0
+        );
+
+        const summary = document.createElement('div');
+
+        summary.style.cssText = `
+            margin-top:14px;
+            padding-top:12px;
+            border-top:1px solid var(--border-color);
+            display:flex;
+            justify-content:space-between;
+            font-size:12px;
+            color:var(--text-muted);
+        `;
+
+        summary.innerHTML = `
+            <span>${state.subjects.length} subject${state.subjects.length !== 1 ? 's' : ''}</span>
+            <span>${totalFiles} document${totalFiles !== 1 ? 's' : ''}</span>
+            <span>${totalChunks} note sections processed</span>
+        `;
+
+        progressEl.appendChild(summary);
     }
 
-    // Quiz trend
+
+    // ═══════════════════════════════════════════════════════════════
+    // QUIZ PERFORMANCE
+    // ═══════════════════════════════════════════════════════════════
     const trendEl = document.getElementById('quiz-trend');
-    if (g.quizHistory.length === 0) {
-        trendEl.innerHTML = '<span>No quizzes taken yet</span>';
+
+    const history = Array.isArray(g.quizHistory)
+        ? g.quizHistory
+        : [];
+
+    if (history.length === 0) {
+        trendEl.innerHTML = `
+            <div style="
+                text-align:center;
+                padding:20px 10px;
+                color:var(--text-muted);
+            ">
+                <div style="font-size:28px;margin-bottom:8px;">📈</div>
+                <div>No quiz attempts yet.</div>
+                <div style="font-size:12px;margin-top:4px;">
+                    Complete a Study Mode quiz to see performance trends.
+                </div>
+            </div>
+        `;
     } else {
-        const last5 = g.quizHistory.slice(-5);
-        trendEl.innerHTML = '<div style="display:flex;gap:8px;align-items:flex-end;height:80px;">' +
-            last5.map(q => {
-                const h = Math.max(10, q.score * 80);
-                return `<div style="width:30px;height:${h}px;background:var(--gradient-primary);border-radius:4px 4px 0 0;" title="${Math.round(q.score * 100)}%"></div>`;
-            }).join('') + '</div>';
+        const scores = history.map(q =>
+            Math.round((q.score || 0) * 100)
+        );
+
+        const average = Math.round(
+            scores.reduce((sum, score) => sum + score, 0) /
+            scores.length
+        );
+
+        const best = Math.max(...scores);
+
+        const recent = history.slice(-6);
+
+        const bars = recent.map((q, index) => {
+            const score = Math.round((q.score || 0) * 100);
+
+            const height = Math.max(
+                18,
+                Math.round((score / 100) * 105)
+            );
+
+            const date = q.date
+                ? new Date(q.date).toLocaleDateString(
+                    undefined,
+                    { day: '2-digit', month: 'short' }
+                )
+                : `Quiz ${index + 1}`;
+
+            return `
+                <div style="
+                    flex:1;
+                    display:flex;
+                    flex-direction:column;
+                    align-items:center;
+                    justify-content:flex-end;
+                    height:135px;
+                    min-width:30px;
+                ">
+                    <div style="
+                        font-size:11px;
+                        font-weight:700;
+                        color:var(--text-main);
+                        margin-bottom:5px;
+                    ">
+                        ${score}%
+                    </div>
+
+                    <div
+                        style="
+                            width:28px;
+                            height:${height}px;
+                            background:var(--gradient-primary);
+                            border-radius:6px 6px 2px 2px;
+                            min-height:18px;
+                        "
+                        title="${score}% on ${date}">
+                    </div>
+
+                    <div style="
+                        font-size:9px;
+                        color:var(--text-muted);
+                        margin-top:6px;
+                        white-space:nowrap;
+                    ">
+                        ${date}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        trendEl.innerHTML = `
+            <div style="
+                display:flex;
+                justify-content:space-around;
+                align-items:flex-end;
+                gap:8px;
+                padding:4px 8px 0;
+                border-bottom:1px solid var(--border-color);
+            ">
+                ${bars}
+            </div>
+            <div style="
+                display:grid;
+                grid-template-columns:repeat(3, 1fr);
+                gap:10px;
+                margin-top:14px;
+            ">
+
+                <div style="
+                    text-align:center;
+                    padding:9px 4px;
+                    border-radius:9px;
+                    background:rgba(99, 88, 220, 0.06);
+                ">
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                        color:var(--text-main);
+                    ">
+                        ${history.length}
+                    </div>
+
+                    <div style="
+                        font-size:10px;
+                        color:var(--text-muted);
+                        margin-top:2px;
+                    ">
+                        Quiz Attempts
+                    </div>
+                </div>
+
+                <div style="
+                    text-align:center;
+                    padding:9px 4px;
+                    border-radius:9px;
+                    background:rgba(99, 88, 220, 0.06);
+                ">
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                        color:var(--text-main);
+                    ">
+                        ${average}%
+                    </div>
+
+                    <div style="
+                        font-size:10px;
+                        color:var(--text-muted);
+                        margin-top:2px;
+                    ">
+                        Average Score
+                    </div>
+                </div>
+
+                <div style="
+                    text-align:center;
+                    padding:9px 4px;
+                    border-radius:9px;
+                    background:rgba(99, 88, 220, 0.06);
+                ">
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                        color:var(--text-main);
+                    ">
+                        ${best}%
+                    </div>
+
+                    <div style="
+                        font-size:10px;
+                        color:var(--text-muted);
+                        margin-top:2px;
+                    ">
+                        Best Score
+                    </div>
+                </div>
+
+            </div>
+        `;
     }
 
-    // Weakness heatmap
+
+    // ═══════════════════════════════════════════════════════════════
+    // WEAKNESS AREAS
+    // ═══════════════════════════════════════════════════════════════
     const weakEl = document.getElementById('weakness-heatmap');
-    weakEl.innerHTML = g.quizHistory.length > 0
-        ? '<span style="color:var(--accent-orange)">Review questions you got wrong in Study Mode</span>'
-        : '<span>Take quizzes to identify weaknesses</span>';
 
-    // Retention
-    const retEl = document.getElementById('retention-predictor');
-    if (g.streak > 0) {
-        const ret = Math.min(95, 50 + g.streak * 5);
-        retEl.innerHTML = `<div style="text-align:center"><div style="font-size:32px;font-weight:800;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${ret}%</div><div style="font-size:12px;color:var(--text-muted);margin-top:4px">Estimated retention (${g.streak}-day streak)</div></div>`;
+    if (history.length === 0) {
+        weakEl.innerHTML = `
+            <div style="
+                text-align:center;
+                padding:20px 10px;
+                color:var(--text-muted);
+            ">
+                <div style="font-size:28px;margin-bottom:8px;">🎯</div>
+                <div>Not enough quiz data yet.</div>
+                <div style="font-size:12px;margin-top:5px;">
+                    Take quizzes to identify areas that need revision.
+                </div>
+            </div>
+
+
+
+        `;
     } else {
-        retEl.innerHTML = '<span>Start studying to see predictions</span>';
+        const scores = history.map(q =>
+            Math.round((q.score || 0) * 100)
+        );
+
+        const average = Math.round(
+            scores.reduce((sum, score) => sum + score, 0) /
+            scores.length
+        );
+
+        const weakCount = scores.filter(
+            score => score < 70
+        ).length;
+
+        const strongCount = scores.filter(
+            score => score >= 80
+        ).length;
+
+        let statusText;
+        let statusClass;
+
+        if (average < 60) {
+            statusText = 'Needs focused revision';
+            statusClass = 'color:var(--accent-orange);';
+        } else if (average < 75) {
+            statusText = 'Some revision recommended';
+            statusClass = 'color:var(--accent-orange);';
+        } else {
+            statusText = 'Good overall understanding';
+            statusClass = 'color:var(--accent-green, #22a06b);';
+        }
+
+        weakEl.innerHTML = `
+            <div style="padding:8px 4px;">
+
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    margin-bottom:16px;
+                ">
+                    <div>
+                        <div style="
+                            font-size:14px;
+                            font-weight:700;
+                            ${statusClass}
+                        ">
+                            ${statusText}
+                        </div>
+
+                        <div style="
+                            font-size:11px;
+                            color:var(--text-muted);
+                            margin-top:4px;
+                        ">
+                            Based on ${history.length} quiz attempt${history.length !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+
+                    <div style="
+                        font-size:24px;
+                        font-weight:800;
+                    ">
+                        ${average}%
+                    </div>
+                </div>
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:1fr 1fr;
+                    gap:10px;
+                ">
+
+                    <div style="
+                        padding:12px;
+                        border-radius:10px;
+                        background:rgba(255, 120, 80, 0.08);
+                    ">
+                        <div style="
+                            font-size:18px;
+                            font-weight:700;
+                        ">
+                            ${weakCount}
+                        </div>
+
+                        <div style="
+                            font-size:11px;
+                            color:var(--text-muted);
+                            margin-top:3px;
+                        ">
+                            Attempts below 70%
+                        </div>
+                    </div>
+
+                    <div style="
+                        padding:12px;
+                        border-radius:10px;
+                        background:rgba(80, 190, 130, 0.08);
+                    ">
+                        <div style="
+                            font-size:18px;
+                            font-weight:700;
+                        ">
+                            ${strongCount}
+                        </div>
+
+                        <div style="
+                            font-size:11px;
+                            color:var(--text-muted);
+                            margin-top:3px;
+                        ">
+                            Strong attempts
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="
+                    font-size:11px;
+                    color:var(--text-muted);
+                    margin-top:12px;
+                ">
+                    Tip: Review questions you answered incorrectly in Study Mode.
+                </div>
+            </div>
+        `;
     }
+
+
+    // ═══════════════════════════════════════════════════════════════
+    // KNOWLEDGE RETENTION
+    // ═══════════════════════════════════════════════════════════════
+    const retEl = document.getElementById('retention-predictor');
+
+    const studyDays = g.studyDays || {};
+    const today = new Date();
+
+    let activeDays = 0;
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(
+            today.getTime() - i * 86400000
+        ).toISOString().slice(0, 10);
+
+        if ((studyDays[d] || 0) > 0) {
+            activeDays++;
+        }
+    }
+
+    const consistency = Math.round(
+        (activeDays / 7) * 100
+    );
+
+    let quizAverage = 0;
+
+    if (history.length > 0) {
+        quizAverage = Math.round(
+            history.reduce(
+                (sum, q) => sum + ((q.score || 0) * 100),
+                0
+            ) / history.length
+        );
+    }
+
+    // Estimated retention is based on two observable signals:
+    // quiz performance + recent study consistency.
+    const retention = history.length > 0
+        ? Math.round(
+            (quizAverage * 0.7) +
+            (consistency * 0.3)
+        )
+        : consistency;
+
+    const boundedRetention = Math.max(
+        0,
+        Math.min(100, retention)
+    );
+
+    retEl.innerHTML = `
+        <div style="text-align:center;padding:4px 0;">
+
+            <div style="
+                font-size:38px;
+                font-weight:800;
+                background:var(--gradient-primary);
+                -webkit-background-clip:text;
+                -webkit-text-fill-color:transparent;
+            ">
+                ${boundedRetention}%
+            </div>
+
+            <div style="
+                font-size:12px;
+                color:var(--text-muted);
+                margin-top:2px;
+            ">
+                <h3>🧠 Study Consistency</h3>
+            </div>
+
+            <div style="
+                margin:18px auto 12px;
+                max-width:260px;
+                height:8px;
+                border-radius:10px;
+                background:var(--border-color);
+                overflow:hidden;
+            ">
+                <div style="
+                    width:${boundedRetention}%;
+                    height:100%;
+                    background:var(--gradient-primary);
+                    border-radius:10px;
+                "></div>
+            </div>
+
+            <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:10px;
+                max-width:280px;
+                margin:0 auto;
+            ">
+
+                <div>
+                    <div style="
+                        font-size:17px;
+                        font-weight:700;
+                    ">
+                        ${quizAverage}%
+                    </div>
+
+                    <div style="
+                        font-size:10px;
+                        color:var(--text-muted);
+                    ">
+                        Quiz accuracy
+                    </div>
+                </div>
+
+                <div>
+                    <div style="
+                        font-size:17px;
+                        font-weight:700;
+                    ">
+                        ${activeDays}/7
+                    </div>
+
+                    <div style="
+                        font-size:10px;
+                        color:var(--text-muted);
+                    ">
+                        Active days
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="
+                font-size:10px;
+                color:var(--text-muted);
+                margin-top:14px;
+            ">
+                Based on recent quiz performance and 7-day study consistency.
+            </div>
+        </div>
+    `;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -223,14 +796,30 @@ function updateAnalytics(g) {
 // ═══════════════════════════════════════════════════════════════════════
 async function loadSubjects() {
     try {
-        const res = await fetch(`${API}/api/subjects`);
+        const res = await fetch(`${API}/api/subjects`, {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Failed to load subjects');
+        }
+
         state.subjects = await res.json();
+
+        state.uploadedFiles = {};
+
+        for (const subject of state.subjects) {
+            state.uploadedFiles[subject.id] = subject.files || [];
+        }
+
         renderSubjects();
     } catch (e) {
         console.error('Failed to load subjects:', e);
     }
 }
-
 function renderSubjects() {
     const list = document.getElementById('subject-list');
     list.innerHTML = '';
@@ -270,7 +859,10 @@ async function createSubject() {
     try {
         const res = await fetch(`${API}/api/subjects/create`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAuthToken()}`
+            },
             body: JSON.stringify({ name }),
         });
         if (!res.ok) {
@@ -285,7 +877,8 @@ async function createSubject() {
         renderSubjects();
         selectSubject(subject.id);
     } catch (e) {
-        alert('Failed to create subject');
+        console.error('Create subject error:', e);
+        alert(`Failed to create subject: ${e.message}`);
     }
 }
 
@@ -315,6 +908,8 @@ async function selectSubject(id) {
     }
 
     state.activeSubjectId = id;
+    state.selectedQuizFile = null;
+
     const subject = state.subjects.find(s => s.id === id);
 
     // Update active badge
@@ -330,6 +925,12 @@ async function selectSubject(id) {
     document.getElementById('send-btn').disabled = false;
     document.getElementById('generate-quiz-btn').disabled = false;
 
+    const flashcardBtn = document.getElementById('generate-flashcards-btn');
+
+    if (flashcardBtn) {
+        flashcardBtn.disabled = false;
+    }
+
     // Clear chat
     const msgs = document.getElementById('chat-messages');
     msgs.innerHTML = `<div class="welcome-card"><h2>📖 ${subject.name}</h2><p>Upload notes and start asking questions. All answers are grounded in your uploaded materials only.</p></div>`;
@@ -338,6 +939,16 @@ async function selectSubject(id) {
     state.quizData = null;
     document.getElementById('quiz-container').innerHTML = '';
     document.getElementById('quiz-results').style.display = 'none';
+
+    // Reset flashcards
+    state.flashcards = [];
+    state.flashcardIndex = 0;
+    state.flashcardFlipped = false;
+
+    const flashcardsSection = document.getElementById('flashcards-section');
+    if (flashcardsSection) {
+        flashcardsSection.style.display = 'none';
+    }
 
     renderSubjects();
     renderFileList();
@@ -453,21 +1064,168 @@ async function uploadFile(file) {
         pipeline.style.display = 'none';
         content.style.display = 'flex';
     }, 2000);
+
 }
 
 function renderFileList() {
     const list = document.getElementById('file-list');
     list.innerHTML = '';
+
     const files = state.uploadedFiles[state.activeSubjectId] || [];
+
     for (const f of files) {
         const div = document.createElement('div');
         div.className = 'file-item';
+
+        const isSelected = state.selectedQuizFile === f.filename;
+
         div.innerHTML = `
-      <span class="file-item-icon">📄</span>
-      <span class="file-item-name">${f.filename}</span>
-      <span class="file-item-chunks">${f.chunks} chunks</span>
-    `;
+            <span class="file-item-icon">📄</span>
+
+            <span class="file-item-name">
+                ${f.filename}
+            </span>
+
+            <span class="file-item-chunks">
+                ${f.chunks} chunks
+            </span>
+
+            <button
+                class="quiz-document-btn"
+                type="button"
+                title="Use this document for quiz"
+                style="
+                    margin-left:auto;
+                    padding:6px 10px;
+                    border:1px solid var(--border-color);
+                    border-radius:6px;
+                    background:${isSelected ? 'var(--accent-blue)' : 'white'};
+                    color:${isSelected ? 'white' : 'var(--text-primary)'};
+                    cursor:pointer;
+                "
+            >
+                ${isSelected ? '✓ Quiz Selected' : 'Use for Quiz'}
+            </button>
+        `;
+
+        const quizButton = div.querySelector('.quiz-document-btn');
+
+        quizButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            state.selectedQuizFile = f.filename;
+
+            renderFileList();
+
+            const selectedText =
+                document.getElementById('selected-quiz-document');
+
+            if (selectedText) {
+                selectedText.textContent =
+                    `Quiz document: ${f.filename}`;
+            }
+        });
+
         list.appendChild(div);
+    }
+}
+async function transcribeHandwriting() {
+    const fileInput = document.getElementById("handwriting-file");
+    const result = document.getElementById("handwriting-result");
+
+    if (!fileInput.files.length) {
+        result.textContent = "Please select a handwritten image.";
+        return;
+    }
+
+    const file = fileInput.files[0];
+
+    result.textContent = "Reading handwritten notes...";
+
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("http://localhost:8000/py/handwriting", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        document.getElementById("handwriting-editor").style.display = "block";
+
+        document.getElementById("handwriting-text").value = data.text;
+
+        result.innerHTML = "";
+
+    } catch (error) {
+        console.error(error);
+        result.textContent =
+            "Failed to transcribe handwritten notes.";
+    }
+}
+
+async function addHandwritingToNotes() {
+    const text = document.getElementById("handwriting-text").value.trim();
+
+    if (!text) {
+        alert("There is no handwritten content to add.");
+        return;
+    }
+
+    if (!state.activeSubjectId) {
+        alert("Please select a subject before adding handwritten notes.");
+        return;
+    }
+    console.log("Handwriting payload:", {
+        subject_id: state.activeSubjectId,
+        filename: "handwritten_notes.txt",
+        text: text
+    });
+    try {
+        const response = await fetch("http://localhost:8000/py/handwriting/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                subject_id: state.activeSubjectId,
+                filename: "handwritten_notes.txt",
+                text: text
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Backend error:", errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+
+        if (!state.uploadedFiles[state.activeSubjectId]) {
+            state.uploadedFiles[state.activeSubjectId] = [];
+        }
+
+        state.uploadedFiles[state.activeSubjectId].push({
+            filename: "handwritten_notes.txt",
+            chunks: data.chunks_added || 0
+        });
+
+        renderFileList();
+
+        alert("Handwritten notes added successfully.");
+
+        console.log("Handwriting added:", data);
+
+    } catch (error) {
+        console.error("Failed to add handwriting:", error);
+        alert("Failed to add handwritten notes.");
     }
 }
 
@@ -675,41 +1433,384 @@ async function simplifyLast() {
     }
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// STUDY MODE
+// ═══════════════════════════════════════════════════════════════════════
 // ═══════════════════════════════════════════════════════════════════════
 // STUDY MODE
 // ═══════════════════════════════════════════════════════════════════════
 async function generateQuiz() {
     if (!state.activeSubjectId) return;
+    if (!state.selectedQuizFile) {
+        alert('Please select a document for the quiz first.');
+        return;
+    }
 
     const container = document.getElementById('quiz-container');
     const resultsEl = document.getElementById('quiz-results');
+    const quizSection = document.getElementById('quiz-section');
+    const flashcardsSection = document.getElementById('flashcards-section');
+
+    // Show quiz section
+    if (quizSection) {
+        quizSection.style.display = 'block';
+    }
+
+    // Hide flashcards while quiz is active
+    if (flashcardsSection) {
+        flashcardsSection.style.display = 'none';
+    }
+
     resultsEl.style.display = 'none';
-    container.innerHTML = '<div class="typing-indicator" style="margin:24px auto"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+
+    container.innerHTML =
+        '<div class="typing-indicator" style="margin:24px auto">' +
+        '<div class="typing-dot"></div>' +
+        '<div class="typing-dot"></div>' +
+        '<div class="typing-dot"></div>' +
+        '</div>';
 
     try {
-        const res = await fetch(`${API}/api/study/${state.activeSubjectId}`, { method: 'POST' });
-        if (!res.ok) throw new Error('Failed to generate quiz');
+        const subject = state.subjects.find(
+            s => s.id === state.activeSubjectId
+        );
+
+        const res = await fetch(
+            `${API}/api/study/${state.activeSubjectId}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    subject_id: state.activeSubjectId,
+                    subject_name: subject?.name || '',
+                    selected_filename: state.selectedQuizFile
+                })
+            }
+        );
+
+        if (!res.ok) {
+            let errorMessage = 'Failed to generate quiz';
+
+            try {
+                const err = await res.json();
+                errorMessage = err.error || errorMessage;
+            } catch {
+                // Keep default error message
+            }
+
+            throw new Error(errorMessage);
+        }
 
         const data = await res.json();
-        if (data.error) throw new Error(data.error);
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
 
         state.quizData = data;
         state.quizAnswers = {};
         state.quizRevealed = false;
+
         renderQuiz();
 
         // XP
         addXP(100, 'Daily quiz');
+
         const g = loadGameData();
         g.totalQuizzes += 1;
         g.dailyQuizDone = true;
+
         saveGameData(g);
         updateGamificationUI();
 
     } catch (e) {
-        container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--accent-orange)">${e.message}</div>`;
+        container.innerHTML =
+            `<div style="text-align:center;padding:40px;color:var(--accent-orange)">${e.message}</div>`;
     }
 }
+
+
+async function generateFlashcards() {
+    if (!state.activeSubjectId) {
+        alert('Please select a subject first.');
+        return;
+    }
+
+    const quizSection =
+        document.getElementById('quiz-section');
+
+    const flashcardsSection =
+        document.getElementById('flashcards-section');
+
+    const questionElement =
+        document.getElementById('flashcard-question');
+
+    const answerElement =
+        document.getElementById('flashcard-answer');
+
+    const countElement =
+        document.getElementById('flashcard-count');
+
+    // Hide quiz
+    if (quizSection) {
+        quizSection.style.display = 'none';
+    }
+
+    // Show flashcards
+    if (flashcardsSection) {
+        flashcardsSection.style.display = 'block';
+    }
+
+    // Show loading state
+    if (questionElement) {
+        questionElement.textContent = 'Loading...';
+    }
+
+    if (answerElement) {
+        answerElement.textContent = 'Loading...';
+    }
+
+    if (countElement) {
+        countElement.textContent = 'Loading...';
+    }
+
+    try {
+        const subject = state.subjects.find(
+            s => s.id === state.activeSubjectId
+        );
+
+        const response = await fetch(`${API}/api/study/${state.activeSubjectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                subject_id: state.activeSubjectId,
+                subject_name: subject?.name || ''
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+
+            console.error(
+                'Flashcard API error:',
+                response.status,
+                errorText
+            );
+
+            throw new Error(
+                `Flashcard request failed: HTTP ${response.status} - ${errorText}`
+            );
+        }
+
+        const data = await response.json();
+
+        console.log(
+            'Flashcard API response:',
+            data
+        );
+
+        let cards = [];
+
+        if (Array.isArray(data.flashcards)) {
+            cards = data.flashcards;
+        } else if (Array.isArray(data.cards)) {
+            cards = data.cards;
+        } else if (Array.isArray(data.mcqs)) {
+            cards = data.mcqs.map(mcq => ({
+                question: mcq.question,
+                answer: mcq.options?.[mcq.correct] || '',
+                source: mcq.citation
+                    ? `${mcq.citation.filename}, Page ${mcq.citation.page}`
+                    : ''
+            }));
+        }
+
+        if (!cards.length) {
+            throw new Error(
+                'No flashcards were returned by the server.'
+            );
+        }
+
+        state.flashcards = cards;
+        state.flashcardIndex = 0;
+        state.flashcardFlipped = false;
+
+        renderFlashcard();
+
+    } catch (error) {
+
+        console.error(
+            'Flashcard generation failed:',
+            error
+        );
+        alert(error.message);
+
+        state.flashcards = [];
+        state.flashcardIndex = 0;
+        state.flashcardFlipped = false;
+
+        if (questionElement) {
+            questionElement.textContent =
+                'Unable to generate flashcards.';
+        }
+
+        if (answerElement) {
+            answerElement.textContent =
+                'Please try again.';
+        }
+
+        if (countElement) {
+            countElement.textContent = '0 / 0';
+        }
+    }
+}
+function renderFlashcard() {
+
+    const flashcard =
+        document.getElementById('flashcard');
+
+    const questionElement =
+        document.getElementById('flashcard-question');
+
+    const answerElement =
+        document.getElementById('flashcard-answer');
+
+    const sourceElement =
+        document.getElementById('flashcard-source');
+
+    const countElement =
+        document.getElementById('flashcard-count');
+
+    if (!state.flashcards.length) {
+
+        if (questionElement) {
+            questionElement.textContent =
+                'No flashcards available.';
+        }
+
+        if (answerElement) {
+            answerElement.textContent = '';
+        }
+
+        if (sourceElement) {
+            sourceElement.textContent = '';
+        }
+
+        if (countElement) {
+            countElement.textContent = '0 / 0';
+        }
+
+        return;
+    }
+
+    const card =
+        state.flashcards[state.flashcardIndex];
+
+    const question =
+        card.concept ||
+        card.term ||
+        card.front ||
+        'Concept unavailable';
+
+    const answer =
+        card.summary ||
+        card.answer ||
+        card.back ||
+        card.definition ||
+        card.explanation ||
+        'Summary unavailable';
+
+    const source =
+        card.source ||
+        card.reference ||
+        card.page ||
+        '';
+
+    if (questionElement) {
+        questionElement.textContent = question;
+    }
+
+    if (answerElement) {
+        answerElement.textContent = answer;
+    }
+
+    if (sourceElement) {
+        sourceElement.textContent =
+            source ? `Source: ${source}` : '';
+    }
+
+    if (countElement) {
+        countElement.textContent =
+            `${state.flashcardIndex + 1} / ${state.flashcards.length}`;
+    }
+
+    if (flashcard) {
+        flashcard.classList.toggle(
+            'flipped',
+            state.flashcardFlipped
+        );
+    }
+}
+
+
+function flipFlashcard() {
+
+    if (!state.flashcards.length) {
+        return;
+    }
+
+    state.flashcardFlipped =
+        !state.flashcardFlipped;
+
+    const flashcard =
+        document.getElementById('flashcard');
+
+    if (flashcard) {
+        flashcard.classList.toggle(
+            'flipped',
+            state.flashcardFlipped
+        );
+    }
+}
+
+function previousFlashcard() {
+
+    if (!state.flashcards.length) {
+        return;
+    }
+
+    state.flashcardIndex =
+        (state.flashcardIndex -
+            1 +
+            state.flashcards.length) %
+        state.flashcards.length;
+
+    state.flashcardFlipped = false;
+
+    renderFlashcard();
+}
+
+
+function nextFlashcard() {
+
+    if (!state.flashcards.length) {
+        return;
+    }
+
+    state.flashcardIndex =
+        (state.flashcardIndex + 1) %
+        state.flashcards.length;
+
+    state.flashcardFlipped = false;
+
+    renderFlashcard();
+}
+
 
 function renderQuiz() {
     const container = document.getElementById('quiz-container');
@@ -1083,26 +2184,7 @@ function showHome(user) {
     if (homeAvatar) homeAvatar.textContent = initial;
 }
 
-function showHome(user) {
-    const authEl = document.getElementById('auth-container');
-    const homeEl = document.getElementById('home-container');
-    const appEl = document.getElementById('app');
 
-    if (authEl) authEl.style.display = 'none';
-    if (appEl) appEl.style.display = 'none';
-    if (homeEl) homeEl.style.display = 'block';
-
-    const studentName = user?.name || 'Student';
-    const initial = studentName.charAt(0).toUpperCase();
-
-    const homeName = document.getElementById('home-user-name');
-    const homeHeroName = document.getElementById('home-hero-name');
-    const homeAvatar = document.getElementById('home-user-avatar');
-
-    if (homeName) homeName.textContent = studentName;
-    if (homeHeroName) homeHeroName.textContent = studentName;
-    if (homeAvatar) homeAvatar.textContent = initial;
-}
 function showDashboard(user) {
     const authEl = document.getElementById('auth-container');
     const homeEl = document.getElementById('home-container');
@@ -1196,8 +2278,15 @@ function setupAuth() {
 
                 // Signup only creates the account.
                 // User must login before entering Home.
-                clearAuthSession();
-                switchAuthMode('login');
+                // 2. Check if student already has an active session
+                const token = getAuthToken();
+                const user = getAuthUser();
+
+                if (token && user) {
+                    showHome(user);
+                } else {
+                    showAuth('login');
+                }
 
                 showAuthAlert(
                     'Account created successfully. Please login to continue.',
@@ -1289,8 +2378,14 @@ function setupAuth() {
                 }
             }
 
-            clearAuthSession();
-            showAuth('login');
+            token = getAuthToken();
+            const user = getAuthUser();
+
+            if (token && user) {
+                showHome(user);
+            } else {
+                showAuth('login');
+            }
         });
     }
 
@@ -1425,6 +2520,69 @@ document.addEventListener('DOMContentLoaded', () => {
     // Retry quiz
     document.getElementById('retry-quiz-btn').addEventListener('click', generateQuiz);
 
+    const handwritingBtn = document.getElementById(
+        "transcribe-handwriting-btn"
+    );
+
+    if (handwritingBtn) {
+        handwritingBtn.addEventListener(
+            "click",
+            transcribeHandwriting
+        );
+    }
+
+
+    const cancelHandwritingBtn = document.getElementById(
+        "cancel-handwriting-btn"
+    );
+
+    if (cancelHandwritingBtn) {
+        cancelHandwritingBtn.addEventListener("click", () => {
+            document.getElementById("handwriting-editor").style.display = "none";
+            document.getElementById("handwriting-text").value = "";
+            document.getElementById("handwriting-file").value = "";
+        });
+    }
+    const addHandwritingBtn = document.getElementById(
+        "add-handwriting-btn"
+    );
+
+    if (addHandwritingBtn) {
+        addHandwritingBtn.addEventListener("click", addHandwritingToNotes);
+    }
+    // Flashcards
+    const flashcardBtn = document.getElementById('generate-flashcards-btn');
+
+    if (flashcardBtn) {
+        flashcardBtn.addEventListener('click', generateFlashcards);
+    }
+
+    const previousFlashcardBtn =
+        document.getElementById('flashcard-prev-btn');
+
+    if (previousFlashcardBtn) {
+        previousFlashcardBtn.addEventListener(
+            'click',
+            previousFlashcard
+        );
+    }
+
+    const nextFlashcardBtn =
+        document.getElementById('flashcard-next-btn');
+
+    if (nextFlashcardBtn) {
+        nextFlashcardBtn.addEventListener(
+            'click',
+            nextFlashcard
+        );
+    }
+
+
+    const flashcard = document.getElementById('flashcard');
+
+    if (flashcard) {
+        flashcard.addEventListener('click', flipFlashcard);
+    }
     // Add XP flash animation style
     const style = document.createElement('style');
     style.textContent = `

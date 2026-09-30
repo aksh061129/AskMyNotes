@@ -58,7 +58,6 @@ const upload = multer({
 });
 
 // ── In-memory state ──────────────────────────────────────────────────
-const subjects = [];                    // { id, name, color, createdAt }
 const conversationMemory = {};          // subjectId → [{ query, answer }]
 
 const COLORS = ["#6C5CE7", "#00B894", "#E17055"];
@@ -70,6 +69,8 @@ const COLORS = ["#6C5CE7", "#00B894", "#E17055"];
 // ─── Authentication & User Store ─────────────────────────────────────────
 const DATA_DIR = path.join(__dirname, "data");
 const USERS_FILE = path.join(DATA_DIR, "users.json");
+const SUBJECTS_FILE = path.join(DATA_DIR, "subjects.json");
+const FILES_FILE = path.join(DATA_DIR, "files.json");
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -90,6 +91,47 @@ function saveUsers(users) {
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), "utf-8");
 }
 
+
+function loadSubjects() {
+  if (fs.existsSync(SUBJECTS_FILE)) {
+    try {
+      return JSON.parse(fs.readFileSync(SUBJECTS_FILE, "utf-8"));
+    } catch (e) {
+      return [];
+    }
+  }
+
+  return [];
+}
+const subjects = loadSubjects();
+
+function saveSubjects(subjects) {
+  fs.writeFileSync(
+    SUBJECTS_FILE,
+    JSON.stringify(subjects, null, 2),
+    "utf-8"
+  );
+}
+
+function loadFiles() {
+  if (fs.existsSync(FILES_FILE)) {
+    try {
+      return JSON.parse(fs.readFileSync(FILES_FILE, "utf-8"));
+    } catch (e) {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function saveFiles(files) {
+  fs.writeFileSync(
+    FILES_FILE,
+    JSON.stringify(files, null, 2),
+    "utf-8"
+  );
+}
 function hashPassword(password, salt) {
   return crypto.scryptSync(password, salt, 64).toString("hex");
 }
@@ -224,29 +266,95 @@ app.post("/api/auth/logout", (req, res) => {
 });
 
 app.post("/api/subjects/create", (req, res) => {
-  const { name } = req.body;
-  if (!name || !name.trim()) {
-    return res.status(400).json({ error: "Subject name is required" });
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
   }
-  if (subjects.length >= MAX_SUBJECTS) {
+
+  const token = authHeader.split(" ")[1];
+  const session = activeSessions.get(token);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Session expired or invalid",
+    });
+  }
+
+  const { name } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({
+      error: "Subject name is required",
+    });
+  }
+
+  const userSubjects = subjects.filter(
+    (s) => s.userId === session.userId
+  );
+
+  if (userSubjects.length >= MAX_SUBJECTS) {
     return res.status(400).json({
       error: `Maximum ${MAX_SUBJECTS} subjects allowed`,
     });
   }
+
   const subject = {
     id: uuidv4(),
+    userId: session.userId,
     name: name.trim(),
-    color: COLORS[subjects.length],
+    color: COLORS[userSubjects.length],
     createdAt: new Date().toISOString(),
   };
+
   subjects.push(subject);
+  saveSubjects(subjects);
+
   conversationMemory[subject.id] = [];
+
   res.json(subject);
 });
 
 // List subjects
 app.get("/api/subjects", (req, res) => {
-  res.json(subjects);
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  const session = activeSessions.get(token);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Session expired or invalid",
+    });
+  }
+
+  const userSubjects = subjects
+    .filter((s) => s.userId === session.userId)
+    .map((subject) => {
+      const subjectFiles = loadFiles().filter(
+        (f) =>
+          f.userId === session.userId &&
+          f.subjectId === subject.id
+      );
+
+      return {
+        ...subject,
+        files: subjectFiles.map((f) => ({
+          filename: f.originalName,
+          chunks: f.chunks || 0,
+        })),
+      };
+    });
+
+  res.json(userSubjects);
 });
 
 // Delete subject
@@ -272,38 +380,84 @@ app.delete("/api/subjects/:id", async (req, res) => {
 
 app.post("/api/upload/:subjectId", upload.single("file"), async (req, res) => {
   const subject = subjects.find((s) => s.id === req.params.subjectId);
+
   if (!subject) {
     return res.status(404).json({ error: "Subject not found" });
   }
+
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
 
   try {
+    // Create permanent storage folder
+    const subjectFilesDir = path.join(
+      DATA_DIR,
+      "users",
+      subject.userId,
+      "subjects",
+      subject.id,
+      "files"
+    );
+
+    fs.mkdirSync(subjectFilesDir, { recursive: true });
+
+    // Save the actual file permanently
+    const storedPath = path.join(
+      subjectFilesDir,
+      req.file.originalname
+    );
+
+    fs.copyFileSync(req.file.path, storedPath);
+
     // Forward to Python /py/ingest
     const form = new FormData();
+
     form.append("file", fs.createReadStream(req.file.path), {
       filename: req.file.originalname,
       contentType: req.file.mimetype,
     });
+
     form.append("subject_id", subject.id);
 
-    const pyRes = await axios.post(`${PYTHON_SERVICE}/py/ingest`, form, {
-      headers: form.getHeaders(),
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
+    const pyRes = await axios.post(
+      `${PYTHON_SERVICE}/py/ingest`,
+      form,
+      {
+        headers: form.getHeaders(),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      }
+    );
+
+    // Store file metadata
+    const files = loadFiles();
+
+    files.push({
+      id: uuidv4(),
+      userId: subject.userId,
+      subjectId: subject.id,
+      originalName: req.file.originalname,
+      storedPath: storedPath,
+      mimeType: req.file.mimetype,
+      size: req.file.size,
+      chunks: pyRes.data.chunks_added || 0,
+      createdAt: new Date().toISOString(),
     });
 
+    saveFiles(files);
+
     res.json(pyRes.data);
+
   } catch (e) {
     const msg = e.response?.data?.detail || e.message;
     res.status(500).json({ error: msg });
+
   } finally {
-    // Clean up temp file
+    // Delete temporary Multer file
     fs.unlink(req.file.path, () => { });
   }
 });
-
 // ── Query ────────────────────────────────────────────────────────────
 
 app.post("/api/query", async (req, res) => {
@@ -347,19 +501,25 @@ app.post("/api/query", async (req, res) => {
 });
 
 // ── Study ────────────────────────────────────────────────────────────
-
 app.post("/api/study/:subjectId", async (req, res) => {
   const subject = subjects.find((s) => s.id === req.params.subjectId);
+
   if (!subject) {
     return res.status(404).json({ error: "Subject not found" });
   }
+
+  // Selected document for quiz/study generation
+  const { selected_filename } = req.body;
 
   try {
     const pyRes = await axios.post(`${PYTHON_SERVICE}/py/study`, {
       subject_id: subject.id,
       subject_name: subject.name,
+      selected_filename: selected_filename || null,
     });
+
     res.json(pyRes.data);
+
   } catch (e) {
     const msg = e.response?.data?.detail || e.message;
     res.status(500).json({ error: msg });

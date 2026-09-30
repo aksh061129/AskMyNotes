@@ -153,13 +153,24 @@ def retrieve(
 
 def retrieve_broad(
     subject_id: str,
-    top_k: int | None = None
+    top_k: int | None = None,
+    filename: str | None = None
 ) -> list[dict]:
 
     if top_k is None:
         top_k = TOP_K_STUDY
 
     metadata = _load_metadata(subject_id)
+
+    if not metadata:
+        return []
+
+    # Filter by selected document
+    if filename:
+        metadata = [
+            m for m in metadata
+            if m.get("filename") == filename
+        ]
 
     if not metadata:
         return []
@@ -186,22 +197,10 @@ def retrieve_broad(
             break
 
     return sampled
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# old code/////
+    
+    
+    
+    # old code/////
 # """FAISS retriever — loads subject index, searches, returns ranked chunks."""
 
 # import json

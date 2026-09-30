@@ -467,7 +467,34 @@
             <button id="add-subject-btn" class="btn btn-primary btn-sm">+ Add</button>
           </div>
         </section>
+        <div class="handwriting-section">
+          <h3>Handwritten Notes</h3>
 
+          <input type="file" id="handwriting-file" accept="image/*" />
+
+          <button id="transcribe-handwriting-btn">
+            Transcribe Handwritten Notes
+          </button>
+
+          <div id="handwriting-result"></div>
+
+          <div id="handwriting-editor" style="display: none;">
+            <h4>Extracted Content</h4>
+
+            <textarea id="handwriting-text" rows="15"
+              placeholder="Extracted handwritten content will appear here..."></textarea>
+
+            <div>
+              <button id="add-handwriting-btn">
+                Add to My Notes
+              </button>
+
+              <button id="cancel-handwriting-btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
         <!-- File Upload -->
         <section class="sidebar-section" id="upload-section" style="display: none;">
           <h2 class="section-title"><span>📄</span> Upload Notes</h2>
@@ -477,6 +504,11 @@
               <span class="upload-icon">📤</span>
               <p>Drop PDF/TXT/DOCX/PPTX/Images/ZIP here or <strong>click to browse</strong></p>
             </div>
+            <div class="resource-option" id="handwritten-notes-option">
+              <span>Handwritten Notes</span>
+              <small>Upload an image of handwritten notes</small>
+            </div>
+            <input type="file" id="handwritten-file-input" accept="image/*" hidden />
             <!-- Animated pipeline -->
             <div id="ingest-pipeline" class="ingest-pipeline" style="display: none;">
               <div class="pipeline-step" data-step="parse">
@@ -574,20 +606,225 @@
         </div>
 
         <!-- ── Study Mode ────────────────────────────── -->
+        <!-- ── Study Mode ────────────────────────────── -->
         <div id="study-view" class="view">
-          <div class="study-header">
-            <h2>📝 Study Mode</h2>
-            <p>Test your knowledge with questions generated from your notes</p>
-            <button id="generate-quiz-btn" class="btn btn-primary" disabled>Generate Quiz</button>
-          </div>
-          <div id="quiz-container" class="quiz-container"></div>
-          <div id="quiz-results" class="quiz-results" style="display: none;">
-            <div class="results-card">
-              <h3>Quiz Complete!</h3>
-              <div id="quiz-score" class="quiz-score"></div>
-              <button id="retry-quiz-btn" class="btn btn-outline">Try Again</button>
+
+          <div class="study-page">
+
+            <!-- Study Header -->
+            <div class="study-header">
+              <div class="study-header-text">
+                <h2>📝 Study Mode</h2>
+                <p>
+                  Review your subject notes, test your knowledge, and revise important concepts.
+                </p>
+              </div>
             </div>
+
+
+            <!-- Study Options -->
+            <div class="study-options">
+
+              <!-- QUIZ OPTION -->
+              <!-- QUIZ OPTION -->
+              <div class="study-option-card quiz-option-card">
+
+                <div class="study-option-main">
+
+                  <div class="study-option-icon quiz-icon">
+                    📝
+                  </div>
+
+                  <div class="study-option-content">
+                    <h3>Quiz</h3>
+
+                    <p>
+                      Test your understanding with questions generated
+                      from your uploaded notes.
+                    </p>
+
+                    <!-- Selected quiz document -->
+                    <div id="selected-quiz-document" style="margin:10px 0;color:var(--text-secondary);">
+                      No document selected
+                    </div>
+
+                    <button id="generate-quiz-btn" class="btn btn-primary study-action-btn" disabled type="button">
+                      Generate Quiz
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- FLASHCARD OPTION -->
+              <div class="study-option-card flashcard-option-card">
+
+                <div class="study-option-main">
+
+                  <div class="study-option-icon flashcard-icon">
+                    🗂️
+                  </div>
+
+                  <div class="study-option-content">
+                    <h3>Flashcards</h3>
+
+                    <p>
+                      Review important concepts from all materials
+                      in this subject.
+                    </p>
+
+                    <button id="generate-flashcards-btn" class="btn btn-outline study-action-btn" disabled
+                      type="button">
+                      Study Flashcards
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Study Materials Summary -->
+            <div id="study-material-info" class="study-material-info">
+
+              <div class="study-material-icon">
+                📚
+              </div>
+
+              <div class="study-material-text">
+                <h3>Your Study Materials</h3>
+
+                <p id="study-material-summary">
+                  Upload notes to start studying.
+                </p>
+              </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- QUIZ AREA                                          -->
+            <!-- Hidden until Generate Quiz is clicked              -->
+            <!-- ================================================= -->
+
+            <div id="quiz-section" class="study-content-section" style="display: none;">
+
+              <div class="study-section-header">
+
+                <div>
+                  <h3>📝 Quiz</h3>
+                  <p>Test yourself using questions from your study materials.</p>
+                </div>
+
+              </div>
+
+              <div id="quiz-container" class="quiz-container"></div>
+
+
+              <div id="quiz-results" class="quiz-results" style="display: none;">
+
+                <div class="results-card">
+
+                  <h3>Quiz Complete!</h3>
+
+                  <div id="quiz-score" class="quiz-score"></div>
+
+                  <button id="retry-quiz-btn" class="btn btn-outline" type="button">
+                    Try Again
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- FLASHCARDS AREA                                   -->
+            <!-- Hidden until Flashcards are implemented/started    -->
+            <!-- ================================================= -->
+
+            <div id="flashcards-section" class="study-content-section" style="display: none;">
+
+              <div class="study-section-header">
+
+                <div>
+                  <h3>🗂️ Flashcards</h3>
+                  <p>Review important concepts from your study materials.</p>
+                </div>
+
+                <span id="flashcard-count" class="flashcard-count">
+                  0 / 0
+                </span>
+
+              </div>
+
+
+              <!-- Flashcard -->
+              <div id="flashcard" class="flashcard">
+
+                <div class="flashcard-inner">
+
+                  <!-- Front -->
+                  <div class="flashcard-front">
+
+                    <span class="flashcard-label">
+                      CONCEPT
+                    </span>
+
+                    <h3 id="flashcard-question">
+                      Loading...
+                    </h3>
+
+                    <p class="flashcard-hint">
+                      Click the card to reveal the key takeaway
+                    </p>
+
+                  </div>
+
+
+                  <!-- Back -->
+                  <div class="flashcard-back">
+
+                    <span class="flashcard-label">
+                      KEY TAKEAWAY
+                    </span>
+
+                    <p id="flashcard-answer">
+                      Loading...
+                    </p>
+
+                    <div id="flashcard-source" class="flashcard-source"></div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- Flashcard Controls -->
+              <div class="flashcard-controls">
+
+                <button id="flashcard-prev-btn" class="btn btn-outline" type="button">
+                  ← Previous
+                </button>
+
+                <button id="flashcard-next-btn" class="btn btn-primary" type="button">
+                  Next →
+                </button>
+
+              </div>
+
+            </div>
+
           </div>
+
         </div>
 
         <!-- ── Analytics Mode ────────────────────────── -->
