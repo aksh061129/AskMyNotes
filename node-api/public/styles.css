@@ -340,7 +340,7 @@ body {
 
 .btn-primary {
   background: var(--gradient-primary);
-  color: white;
+  color: rgb(36, 25, 25);
   box-shadow: var(--shadow-glow-purple);
 }
 
@@ -387,16 +387,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .upload-icon {
-  font-size: 32px;
-  opacity: 0.6;
+  font-size: 34px;
+  opacity: 0.7;
 }
 
 .upload-content p {
-  font-size: 13px;
+  margin: 0;
+  font-size: 15px;
   color: var(--text-secondary);
 }
 
@@ -484,38 +485,88 @@ body {
   color: var(--text-secondary);
 }
 
+/* ── Uploaded Notes ───────────────────────────────────────────── */
+
 .file-list {
-  margin-top: 8px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
 }
 
 .file-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
   background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   font-size: 12px;
   color: var(--text-secondary);
+  transition: var(--transition-base);
+}
+
+.file-item:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-medium);
+}
+
+.file-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .file-item-icon {
-  font-size: 14px;
+  font-size: 16px;
+  flex-shrink: 0;
 }
 
 .file-item-name {
   flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.file-item-chunks {
-  color: var(--text-muted);
-  font-size: 11px;
+/* ── Use for Quiz button ───────────────────────────────────── */
+
+.quiz-document-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.quiz-document-btn:hover {
+  border-color: var(--accent-purple);
+  background: rgba(108, 92, 231, 0.08);
+  color: var(--accent-purple);
+}
+
+.quiz-document-btn.selected {
+  background: var(--gradient-primary);
+  border-color: var(--accent-purple);
+  color: white;
+  box-shadow: var(--shadow-glow-purple);
+}
+
+.quiz-document-btn.selected:hover {
+  background: var(--gradient-primary);
+  color: white;
 }
 
 /* ── Content Area ───────────────────────────────────────────────────── */
@@ -3238,4 +3289,136 @@ body {
 
 #cancel-handwriting-btn:hover {
   background: #f1f5f9;
+}
+
+/* ── Styled File Choose Buttons ───────────────────────────── */
+
+#handwriting-file,
+#file-input {
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  width: 100%;
+}
+
+/* Native file button */
+#handwriting-file::file-selector-button,
+#file-input::file-selector-button {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 9px 16px;
+  margin-right: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+#handwriting-file::file-selector-button:hover,
+#file-input::file-selector-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-purple);
+}
+
+/* ── Personalized Study Plan ───────────────────────────── */
+
+.study-plan-card {
+  margin-top: 18px;
+  padding: 22px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.study-plan-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.study-plan-header p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.study-plan-day {
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.study-plan-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.study-plan-icon {
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.study-plan-content {
+  flex: 1;
+}
+
+.study-plan-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.study-plan-details {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.study-plan-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-accent);
+  white-space: nowrap;
+}
+
+.study-plan-empty {
+  padding: 20px 10px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.study-plan-empty.success {
+  color: var(--accent-green, #22a06b);
+}
+
+.start-study-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 11px 18px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gradient-primary);
+  color: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.start-study-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-glow-purple);
 }

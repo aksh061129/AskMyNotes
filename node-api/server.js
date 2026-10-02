@@ -104,6 +104,7 @@ function loadSubjects() {
   return [];
 }
 const subjects = loadSubjects();
+let conversations = loadConversations();
 
 function saveSubjects(subjects) {
   fs.writeFileSync(
@@ -130,6 +131,28 @@ function saveFiles(files) {
     FILES_FILE,
     JSON.stringify(files, null, 2),
     "utf-8"
+  );
+}
+function loadConversations() {
+  const file = path.join(DATA_DIR, "conversations.json");
+
+  if (!fs.existsSync(file)) {
+    fs.writeFileSync(file, "[]", "utf8");
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+function saveConversations(conversations) {
+  const file = path.join(DATA_DIR, "conversations.json");
+  fs.writeFileSync(
+    file,
+    JSON.stringify(conversations, null, 2),
+    "utf8"
   );
 }
 function hashPassword(password, salt) {
@@ -461,9 +484,28 @@ app.post("/api/upload/:subjectId", upload.single("file"), async (req, res) => {
 // ── Query ────────────────────────────────────────────────────────────
 
 app.post("/api/query", async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  const session = activeSessions.get(token);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Session expired or invalid",
+    });
+  }
   const { subject_id, query } = req.body;
-  const subject = subjects.find((s) => s.id === subject_id);
-  if (!subject) {
+  const subject = subjects.find(
+    (s) =>
+      s.id === subject_id &&
+      s.userId === session.userId
+  ); if (!subject) {
     return res.status(404).json({ error: "Subject not found" });
   }
   if (!query || !query.trim()) {
@@ -480,18 +522,60 @@ app.post("/api/query", async (req, res) => {
       conversation_history: history.slice(-4),
     });
 
-    // Store in conversation memory
+    // Store in temporary conversation memory
     if (!conversationMemory[subject_id]) {
       conversationMemory[subject_id] = [];
     }
+
     conversationMemory[subject_id].push({
       query: query.trim(),
       answer: pyRes.data.answer || "",
     });
-    // Keep only last 8 turns in memory
+
     if (conversationMemory[subject_id].length > 8) {
-      conversationMemory[subject_id] = conversationMemory[subject_id].slice(-8);
+      conversationMemory[subject_id] =
+        conversationMemory[subject_id].slice(-8);
     }
+
+    // Store persistent conversation
+    let conversation = conversations.find(
+      (c) =>
+        c.userId === session.userId &&
+        c.subjectId === subject.id
+    );
+
+    if (!conversation) {
+      conversation = {
+        id: uuidv4(),
+        userId: session.userId,
+        subjectId: subject.id,
+        messages: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      conversations.push(conversation);
+    }
+
+    conversation.messages.push(
+      {
+        role: "user",
+        content: query.trim(),
+        timestamp: new Date().toISOString(),
+      },
+      {
+        role: "assistant",
+        content: pyRes.data.answer || "",
+        citations: pyRes.data.citations || [],
+        evidence_snippets: pyRes.data.evidence_snippets || [],
+        answer_found: pyRes.data.answer_found ?? true,
+        timestamp: new Date().toISOString(),
+      }
+    );
+
+    conversation.updatedAt = new Date().toISOString();
+
+    saveConversations(conversations);
 
     res.json(pyRes.data);
   } catch (e) {
@@ -499,6 +583,30 @@ app.post("/api/query", async (req, res) => {
     res.status(500).json({ error: msg });
   }
 });
+
+app.post("/api/ai-answer", async (req, res) => {
+  const { query } = req.body;
+
+  if (!query || !query.trim()) {
+    return res.status(400).json({
+      error: "Query is required",
+    });
+  }
+
+  try {
+    const pyRes = await axios.post(`${PYTHON_SERVICE}/py/ai-answer`, {
+      query: query.trim(),
+    });
+
+    res.json(pyRes.data);
+
+  } catch (e) {
+    const msg = e.response?.data?.detail || e.message;
+    res.status(500).json({ error: msg });
+  }
+});
+// ── General AI Fallback ─────────────────────────────────────────────
+
 
 // ── Study ────────────────────────────────────────────────────────────
 app.post("/api/study/:subjectId", async (req, res) => {
@@ -567,6 +675,48 @@ app.get("/api/stats/:subjectId", async (req, res) => {
     const msg = e.response?.data?.detail || e.message;
     res.status(500).json({ error: msg });
   }
+});
+// ── Get Subject Conversation ────────────────────────────────────────
+app.get("/api/conversations/:subjectId", (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
+  }
+
+  const token = authHeader.split(" ")[1];
+  const session = activeSessions.get(token);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Session expired or invalid",
+    });
+  }
+
+  const subject = subjects.find(
+    (s) =>
+      s.id === req.params.subjectId &&
+      s.userId === session.userId
+  );
+
+  if (!subject) {
+    return res.status(404).json({
+      error: "Subject not found",
+    });
+  }
+
+  const conversation = conversations.find(
+    (c) =>
+      c.userId === session.userId &&
+      c.subjectId === subject.id
+  );
+
+  res.json({
+    subjectId: subject.id,
+    messages: conversation?.messages || [],
+  });
 });
 
 // ── SPA fallback ─────────────────────────────────────────────────────

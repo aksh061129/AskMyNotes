@@ -454,23 +454,36 @@
 
     <main id="main-layout">
       <!-- ── Sidebar ──────────────────────────────────── -->
+      <!-- ── Sidebar ──────────────────────────────────── -->
       <aside id="sidebar">
+
         <!-- Subject Management -->
         <section class="sidebar-section">
           <h2 class="section-title">
             <span>📂</span> Subjects
             <span class="subject-count" id="subject-counter">0/3</span>
           </h2>
+
           <div id="subject-list" class="subject-list"></div>
+
           <div id="add-subject-form" class="add-subject">
             <input type="text" id="subject-name-input" placeholder="New subject name…" maxlength="30" />
-            <button id="add-subject-btn" class="btn btn-primary btn-sm">+ Add</button>
+            <button id="add-subject-btn" class="btn btn-primary btn-sm">
+              + Add
+            </button>
           </div>
         </section>
+
+
+        <!-- Handwritten Notes -->
         <div class="handwriting-section">
           <h3>Handwritten Notes</h3>
 
-          <input type="file" id="handwriting-file" accept="image/*" />
+          <label for="handwriting-file" class="custom-file-button">
+            Choose Handwritten Image
+          </label>
+
+          <input type="file" id="handwriting-file" accept="image/*" hidden />
 
           <button id="transcribe-handwriting-btn">
             Transcribe Handwritten Notes
@@ -495,46 +508,70 @@
             </div>
           </div>
         </div>
+
+
         <!-- File Upload -->
         <section class="sidebar-section" id="upload-section" style="display: none;">
-          <h2 class="section-title"><span>📄</span> Upload Notes</h2>
+
+          <h2 class="section-title">
+            <span>📄</span> Upload Notes
+          </h2>
+
           <div id="upload-zone" class="upload-zone">
-            <input type="file" id="file-input" accept=".pdf,.txt,.text,.docx,.pptx,.png,.jpg,.jpeg,.webp,.zip">
+
             <div class="upload-content" id="upload-content">
+
               <span class="upload-icon">📤</span>
-              <p>Drop PDF/TXT/DOCX/PPTX/Images/ZIP here or <strong>click to browse</strong></p>
+
+              <p>Drop Resources Here!</p>
+
+
+
             </div>
-            <div class="resource-option" id="handwritten-notes-option">
-              <span>Handwritten Notes</span>
-              <small>Upload an image of handwritten notes</small>
-            </div>
+
+            <input type="file" id="file-input" accept=".pdf,.txt,.text,.docx,.pptx,.png,.jpg,.jpeg,.webp,.zip" hidden>
+
+            <div class="resource-option" id="handwritten-notes-option"></div>
+
             <input type="file" id="handwritten-file-input" accept="image/*" hidden />
+
             <!-- Animated pipeline -->
             <div id="ingest-pipeline" class="ingest-pipeline" style="display: none;">
               <div class="pipeline-step" data-step="parse">
                 <div class="step-indicator"></div>
                 <span>Parse</span>
               </div>
+
               <div class="pipeline-arrow">→</div>
+
               <div class="pipeline-step" data-step="chunk">
                 <div class="step-indicator"></div>
                 <span>Chunk</span>
               </div>
+
               <div class="pipeline-arrow">→</div>
+
               <div class="pipeline-step" data-step="embed">
                 <div class="step-indicator"></div>
                 <span>Embed</span>
               </div>
+
               <div class="pipeline-arrow">→</div>
+
               <div class="pipeline-step" data-step="ready">
                 <div class="step-indicator"></div>
                 <span>Ready</span>
               </div>
             </div>
+
           </div>
+
           <div id="upload-status" class="upload-status"></div>
+
           <div id="file-list" class="file-list"></div>
+
         </section>
+
 
         <!-- Gamification Panel -->
         <section class="sidebar-section">
@@ -831,7 +868,7 @@
         <div id="analytics-view" class="view">
           <div class="analytics-grid">
             <div class="analytics-card">
-              <h3>📊 Subject Progress</h3>
+              <h3>📚 Subject Progress</h3>
               <div id="subject-progress" class="progress-bars"></div>
             </div>
             <div class="analytics-card">
@@ -845,6 +882,26 @@
             <div class="analytics-card">
               <h3>🧠 Knowledge Retention</h3>
               <div id="retention-predictor" class="retention"></div>
+            </div>
+            <div class="study-plan-card" id="study-plan-section">
+
+              <div class="study-plan-header">
+                <div>
+                  <h3>📅 Personalized Study Plan</h3>
+                  <p>Based on your recent quiz performance</p>
+                </div>
+              </div>
+
+              <div class="study-plan-day">
+                TODAY
+              </div>
+
+              <div id="study-plan-list"></div>
+
+              <button class="start-study-btn" id="start-study-btn" type="button">
+                Start Study Session
+              </button>
+
             </div>
           </div>
         </div>

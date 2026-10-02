@@ -12,6 +12,7 @@ import pytesseract
 import zipfile
 import tempfile
 import os
+import io
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
@@ -117,20 +118,64 @@ def _parse_docx(file_path: str) -> list[dict]:
 
     return pages
 
+def _extract_shape_text(shape) -> list[str]:
+    """Recursively extract text from normal and grouped PowerPoint shapes."""
+    texts = []
+
+    # Normal text-containing shape
+    if hasattr(shape, "text"):
+        text = shape.text.strip()
+        if text:
+            texts.append(text)
+
+    # Grouped shape: recursively inspect child shapes
+    if hasattr(shape, "shapes"):
+        for child_shape in shape.shapes:
+            texts.extend(_extract_shape_text(child_shape))
+
+    return texts
 
 def _parse_pptx(file_path: str) -> list[dict]:
-    """Parse PPTX/PowerPoint presentation into text entries."""
+    """Parse PPTX and OCR picture shapes containing text/equations."""
     presentation = Presentation(file_path)
     slides = []
     filename = Path(file_path).name
 
     for slide_number, slide in enumerate(presentation.slides, start=1):
         texts = []
+
         for shape in slide.shapes:
+
+            # Normal PowerPoint text
             if hasattr(shape, "text"):
                 text = shape.text.strip()
                 if text:
                     texts.append(text)
+
+            # Picture / image inside the slide
+            if shape.shape_type == 13:  # PICTURE
+                try:
+                    image = Image.open(
+                        io.BytesIO(shape.image.blob)
+                    )
+
+                    ocr_text = pytesseract.image_to_string(
+                        image
+                    ).strip()
+
+                    if ocr_text:
+                        texts.append(ocr_text)
+
+                    print(
+                        f"[PPTX OCR] Slide {slide_number}: "
+                        f"{repr(ocr_text)}"
+                    )
+
+                except Exception as e:
+                    print(
+                        f"[PPTX OCR] Failed on slide "
+                        f"{slide_number}: {e}"
+                    )
 
         if texts:
             slides.append({
@@ -140,7 +185,6 @@ def _parse_pptx(file_path: str) -> list[dict]:
             })
 
     return slides
-
 
 def _parse_image(file_path: str) -> list[dict]:
     """Parse image (PNG, JPG, JPEG, WEBP) using pytesseract OCR → single entry."""

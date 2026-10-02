@@ -59,7 +59,12 @@ const BADGES_DEF = [
 ];
 
 function loadGameData() {
-    const d = localStorage.getItem('askmynotes_game');
+    const user = getAuthUser();
+    const userId = user?.id || 'guest';
+    const storageKey = `askmynotes_game_${userId}`;
+
+    const d = localStorage.getItem(storageKey);
+
     return d ? JSON.parse(d) : {
         xp: 0,
         streak: 0,
@@ -71,20 +76,24 @@ function loadGameData() {
         totalChunks: 0,
         quizHistory: [],
         badges: [],
-        studyDays: {},    // 'YYYY-MM-DD' → minutes
+        studyDays: {},
         dailyQuizDone: false,
         streakFreezes: 1,
     };
 }
 
 function saveGameData(g) {
-    localStorage.setItem('askmynotes_game', JSON.stringify(g));
-}
+    const user = getAuthUser();
+    const userId = user?.id || 'guest';
+    const storageKey = `askmynotes_game_${userId}`;
 
+    localStorage.setItem(storageKey, JSON.stringify(g));
+}
 function addXP(amount, reason) {
     const g = loadGameData();
     g.xp += amount;
     saveGameData(g);
+
     updateGamificationUI();
     // Flash XP badge
     const badge = document.getElementById('xp-badge');
@@ -188,132 +197,117 @@ function updateGamificationUI() {
 // ═══════════════════════════════════════════════════════════════════════
 function updateAnalytics(g) {
     // ═══════════════════════════════════════════════════════════════
-    // SUBJECT COVERAGE
+    // SUBJECT PROGRESS
     // ═══════════════════════════════════════════════════════════════
+
     const progressEl = document.getElementById('subject-progress');
+
     progressEl.innerHTML = '';
 
     if (state.subjects.length === 0) {
+
         progressEl.innerHTML = `
-            <div style="text-align:center;color:var(--text-muted);padding:25px 10px;">
-                <div style="font-size:28px;margin-bottom:8px;">📚</div>
-                <div>No subjects created yet.</div>
-                <div style="font-size:12px;margin-top:4px;">
-                    Create a subject and upload notes to start tracking progress.
-                </div>
+        <div style="
+            text-align:center;
+            color:var(--text-muted);
+            padding:25px 10px;
+        ">
+            <div style="font-size:28px;margin-bottom:8px;">📚</div>
+
+            <div>No subjects created yet.</div>
+
+            <div style="
+                font-size:12px;
+                margin-top:4px;
+            ">
+                Create a subject and upload notes to start tracking progress.
             </div>
-        `;
+        </div>
+    `;
+
     } else {
-        const subjectStats = state.subjects.map(s => {
-            const files = state.uploadedFiles[s.id] || [];
-            const totalChunks = files.reduce(
-                (sum, f) => sum + (f.chunks || 0),
-                0
-            );
 
-            return {
-                subject: s,
-                files,
-                totalChunks
-            };
-        });
+        for (const subject of state.subjects) {
 
-        const maxChunks = Math.max(
-            1,
-            ...subjectStats.map(x => x.totalChunks)
-        );
+            const files = state.uploadedFiles[subject.id] || [];
 
-        for (const itemData of subjectStats) {
-            const s = itemData.subject;
-            const files = itemData.files;
-            const totalChunks = itemData.totalChunks;
+            /*
+             * IMPORTANT:
+             * Progress is NOT calculated from chunks.
+             * For now, use quiz performance if available.
+             */
 
-            const coverage = Math.round(
-                (totalChunks / maxChunks) * 100
-            );
+            const subjectQuizData =
+                g?.subjectProgress?.find(
+                    item => item.subject_id === subject.id
+                );
+
+            const accuracy = subjectQuizData?.accuracy || 0;
+            const quizzes = subjectQuizData?.quizzes || 0;
+
+            /*
+             * Until the actual learning-progress calculation
+             * is connected, accuracy represents the user's
+             * current measurable progress.
+             */
+            const progress = Math.round(accuracy);
 
             const item = document.createElement('div');
+
             item.className = 'progress-item';
 
             item.innerHTML = `
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-bottom:5px;
-                ">
-                    <span class="progress-item-label">
-                        ${s.name}
-                    </span>
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:6px;
+            ">
 
-                    <span style="
-                        font-size:11px;
-                        color:var(--text-muted);
+                <span class="progress-item-label">
+                    ${escapeHtml(subject.name)}
+                </span>
+
+                <span style="
+                    font-size:13px;
+                    font-weight:600;
+                    color:var(--text-accent);
+                ">
+                    ${progress}%
+                </span>
+
+            </div>
+
+            <div class="progress-item-bar">
+
+                <div
+                    class="progress-item-fill"
+                    style="
+                        width:${progress}%;
+                        background:${subject.color};
                     ">
-                        ${files.length} file${files.length !== 1 ? 's' : ''}
-                    </span>
                 </div>
 
-                <div style="
-                    display:flex;
-                    align-items:center;
-                    gap:10px;
-                ">
-                    <div class="progress-item-bar" style="flex:1;">
-                        <div
-                            class="progress-item-fill"
-                            style="
-                                width:${coverage}%;
-                                background:${s.color};
-                            ">
-                        </div>
-                    </div>
+            </div>
 
-                    <span style="
-                        font-size:11px;
-                        color:var(--text-muted);
-                        min-width:65px;
-                        text-align:right;
-                    ">
-                        ${totalChunks} sections
-                    </span>
-                </div>
-            `;
+            <div style="
+                margin-top:7px;
+                font-size:11px;
+                color:var(--text-muted);
+            ">
+                ${files.length}
+                resource${files.length !== 1 ? 's' : ''}
+                ·
+                ${quizzes}
+                quiz${quizzes !== 1 ? 'zes' : ''}
+                ·
+                ${accuracy}% accuracy
+            </div>
+        `;
 
             progressEl.appendChild(item);
         }
-
-        const totalFiles = subjectStats.reduce(
-            (sum, x) => sum + x.files.length,
-            0
-        );
-
-        const totalChunks = subjectStats.reduce(
-            (sum, x) => sum + x.totalChunks,
-            0
-        );
-
-        const summary = document.createElement('div');
-
-        summary.style.cssText = `
-            margin-top:14px;
-            padding-top:12px;
-            border-top:1px solid var(--border-color);
-            display:flex;
-            justify-content:space-between;
-            font-size:12px;
-            color:var(--text-muted);
-        `;
-
-        summary.innerHTML = `
-            <span>${state.subjects.length} subject${state.subjects.length !== 1 ? 's' : ''}</span>
-            <span>${totalFiles} document${totalFiles !== 1 ? 's' : ''}</span>
-            <span>${totalChunks} note sections processed</span>
-        `;
-
-        progressEl.appendChild(summary);
     }
-
 
     // ═══════════════════════════════════════════════════════════════
     // QUIZ PERFORMANCE
@@ -323,6 +317,8 @@ function updateAnalytics(g) {
     const history = Array.isArray(g.quizHistory)
         ? g.quizHistory
         : [];
+    console.log("QUIZ HISTORY:", history);
+    console.log("FIRST QUIZ:", history[0]);
 
     if (history.length === 0) {
         trendEl.innerHTML = `
@@ -504,39 +500,69 @@ function updateAnalytics(g) {
     // ═══════════════════════════════════════════════════════════════
     // WEAKNESS AREAS
     // ═══════════════════════════════════════════════════════════════
+    // ═══════════════════════════════════════════════════════════════
+    // WEAKNESS AREAS
+    // ═══════════════════════════════════════════════════════════════
+
     const weakEl = document.getElementById('weakness-heatmap');
 
-    if (history.length === 0) {
+    if (!weakEl) {
+        return;
+    }
+
+    // Use the existing quiz history from updateAnalytics()
+    // Do NOT create another quiz history source here.
+    const weaknessHistory = Array.isArray(g.quizHistory)
+        ? g.quizHistory
+        : [];
+
+    if (weaknessHistory.length === 0) {
+
         weakEl.innerHTML = `
+        <div style="
+            text-align:center;
+            padding:20px 10px;
+            color:var(--text-muted);
+        ">
             <div style="
-                text-align:center;
-                padding:20px 10px;
-                color:var(--text-muted);
+                font-size:28px;
+                margin-bottom:8px;
             ">
-                <div style="font-size:28px;margin-bottom:8px;">🎯</div>
-                <div>Not enough quiz data yet.</div>
-                <div style="font-size:12px;margin-top:5px;">
-                    Take quizzes to identify areas that need revision.
-                </div>
+                🎯
             </div>
 
+            <div>
+                Not enough quiz data yet.
+            </div>
 
+            <div style="
+                font-size:12px;
+                margin-top:5px;
+            ">
+                Take quizzes to identify areas that need revision.
+            </div>
+        </div>
+    `;
 
-        `;
     } else {
-        const scores = history.map(q =>
-            Math.round((q.score || 0) * 100)
+
+        // Convert quiz scores into percentages
+        const scores = weaknessHistory.map(q =>
+            Math.round((Number(q.score) || 0) * 100)
         );
 
+        // Average quiz performance
         const average = Math.round(
             scores.reduce((sum, score) => sum + score, 0) /
             scores.length
         );
 
+        // Number of weak attempts
         const weakCount = scores.filter(
             score => score < 70
         ).length;
 
+        // Number of strong attempts
         const strongCount = scores.filter(
             score => score >= 80
         ).length;
@@ -545,113 +571,134 @@ function updateAnalytics(g) {
         let statusClass;
 
         if (average < 60) {
+
             statusText = 'Needs focused revision';
             statusClass = 'color:var(--accent-orange);';
+
         } else if (average < 75) {
+
             statusText = 'Some revision recommended';
             statusClass = 'color:var(--accent-orange);';
+
         } else {
+
             statusText = 'Good overall understanding';
             statusClass = 'color:var(--accent-green, #22a06b);';
         }
 
         weakEl.innerHTML = `
-            <div style="padding:8px 4px;">
+        <div style="
+            padding:8px 4px;
+        ">
 
-                <div style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                    margin-bottom:16px;
-                ">
-                    <div>
-                        <div style="
-                            font-size:14px;
-                            font-weight:700;
-                            ${statusClass}
-                        ">
-                            ${statusText}
-                        </div>
+            <!-- Status -->
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:16px;
+            ">
 
-                        <div style="
-                            font-size:11px;
-                            color:var(--text-muted);
-                            margin-top:4px;
-                        ">
-                            Based on ${history.length} quiz attempt${history.length !== 1 ? 's' : ''}
-                        </div>
+                <div>
+
+                    <div style="
+                        font-size:14px;
+                        font-weight:700;
+                        ${statusClass}
+                    ">
+                        ${statusText}
                     </div>
 
                     <div style="
-                        font-size:24px;
-                        font-weight:800;
+                        font-size:11px;
+                        color:var(--text-muted);
+                        margin-top:4px;
                     ">
-                        ${average}%
-                    </div>
-                </div>
-
-                <div style="
-                    display:grid;
-                    grid-template-columns:1fr 1fr;
-                    gap:10px;
-                ">
-
-                    <div style="
-                        padding:12px;
-                        border-radius:10px;
-                        background:rgba(255, 120, 80, 0.08);
-                    ">
-                        <div style="
-                            font-size:18px;
-                            font-weight:700;
-                        ">
-                            ${weakCount}
-                        </div>
-
-                        <div style="
-                            font-size:11px;
-                            color:var(--text-muted);
-                            margin-top:3px;
-                        ">
-                            Attempts below 70%
-                        </div>
-                    </div>
-
-                    <div style="
-                        padding:12px;
-                        border-radius:10px;
-                        background:rgba(80, 190, 130, 0.08);
-                    ">
-                        <div style="
-                            font-size:18px;
-                            font-weight:700;
-                        ">
-                            ${strongCount}
-                        </div>
-
-                        <div style="
-                            font-size:11px;
-                            color:var(--text-muted);
-                            margin-top:3px;
-                        ">
-                            Strong attempts
-                        </div>
+                        Based on ${weaknessHistory.length}
+                        quiz attempt${weaknessHistory.length !== 1 ? 's' : ''}
                     </div>
 
                 </div>
 
                 <div style="
-                    font-size:11px;
-                    color:var(--text-muted);
-                    margin-top:12px;
+                    font-size:24px;
+                    font-weight:800;
+                    color:var(--text-main);
                 ">
-                    Tip: Review questions you answered incorrectly in Study Mode.
+                    ${average}%
                 </div>
+
             </div>
-        `;
+
+            <!-- Weak / Strong statistics -->
+            <div style="
+                display:grid;
+                grid-template-columns:1fr 1fr;
+                gap:10px;
+            ">
+
+                <!-- Weak -->
+                <div style="
+                    padding:12px;
+                    border-radius:10px;
+                    background:rgba(255,120,80,0.08);
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                    ">
+                        ${weakCount}
+                    </div>
+
+                    <div style="
+                        font-size:11px;
+                        color:var(--text-muted);
+                        margin-top:3px;
+                    ">
+                        Attempts below 70%
+                    </div>
+
+                </div>
+
+                <!-- Strong -->
+                <div style="
+                    padding:12px;
+                    border-radius:10px;
+                    background:rgba(80,190,130,0.08);
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:700;
+                    ">
+                        ${strongCount}
+                    </div>
+
+                    <div style="
+                        font-size:11px;
+                        color:var(--text-muted);
+                        margin-top:3px;
+                    ">
+                        Strong attempts
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Tip -->
+            <div style="
+                font-size:11px;
+                color:var(--text-muted);
+                margin-top:12px;
+            ">
+                Tip: Review questions you answered incorrectly in Study Mode.
+            </div>
+
+        </div>
+    `;
     }
-
-
     // ═══════════════════════════════════════════════════════════════
     // KNOWLEDGE RETENTION
     // ═══════════════════════════════════════════════════════════════
@@ -789,6 +836,151 @@ function updateAnalytics(g) {
             </div>
         </div>
     `;
+
+    // Knowledge retention code...
+    // existing code...
+    // DO NOT REMOVE IT
+
+
+    // Personalized Study Plan
+    renderStudyPlan(history);
+}
+
+
+function renderStudyPlan(history) {
+
+    const planEl = document.getElementById('study-plan-list');
+
+    if (!planEl) return;
+
+    planEl.innerHTML = '';
+
+    // No quiz data
+    if (!Array.isArray(history) || history.length === 0) {
+
+        planEl.innerHTML = `
+            <div class="study-plan-empty">
+                Take a quiz to generate your personalized study plan.
+            </div>
+        `;
+
+        return;
+    }
+
+    /*
+     * Calculate average performance for each subject.
+     */
+    const subjectStats = {};
+
+    history.forEach(q => {
+
+        const subject =
+            q.subject ||
+            q.subjectName ||
+            'General';
+
+        const score =
+            Math.round((q.score || 0) * 100);
+
+        if (!subjectStats[subject]) {
+            subjectStats[subject] = {
+                total: 0,
+                attempts: 0
+            };
+        }
+
+        subjectStats[subject].total += score;
+        subjectStats[subject].attempts += 1;
+    });
+
+
+    /*
+     * Convert into subject performance.
+     */
+    const subjects = Object.entries(subjectStats)
+        .map(([subject, data]) => ({
+            subject,
+            accuracy: Math.round(
+                data.total / data.attempts
+            )
+        }))
+        .filter(item => item.accuracy < 70)
+        .sort((a, b) => a.accuracy - b.accuracy)
+        .slice(0, 3);
+
+
+    // No weak subjects
+    if (subjects.length === 0) {
+
+        planEl.innerHTML = `
+            <div class="study-plan-empty success">
+                🎉 You're doing well across your quizzes.
+                Keep practicing to maintain your progress.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /*
+     * Create study recommendations.
+     */
+    subjects.forEach((item, index) => {
+
+        let priority;
+        let icon;
+        let duration;
+
+        if (item.accuracy < 50) {
+
+            icon = '🔴';
+            priority = 'High priority';
+            duration = 30;
+
+        } else if (item.accuracy < 60) {
+
+            icon = '🟠';
+            priority = 'Needs revision';
+            duration = 25;
+
+        } else {
+
+            icon = '🟡';
+            priority = 'Practice recommended';
+            duration = 20;
+        }
+
+
+        const div = document.createElement('div');
+
+        div.className = 'study-plan-item';
+
+        div.innerHTML = `
+            <div class="study-plan-icon">
+                ${icon}
+            </div>
+
+            <div class="study-plan-content">
+
+                <div class="study-plan-title">
+                    ${index + 1}. ${escapeHtml(item.subject)}
+                </div>
+
+                <div class="study-plan-details">
+                    Accuracy: ${item.accuracy}%
+                    · ${priority}
+                </div>
+
+            </div>
+
+            <div class="study-plan-time">
+                ${duration} min
+            </div>
+        `;
+
+        planEl.appendChild(div);
+    });
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -902,10 +1094,6 @@ async function deleteSubject(id) {
 async function selectSubject(id) {
     if (state.activeSubjectId === id) return;
 
-    // Clear conversation memory on subject switch
-    if (state.activeSubjectId) {
-        try { await fetch(`${API}/api/memory/clear/${state.activeSubjectId}`, { method: 'POST' }); } catch (e) { }
-    }
 
     state.activeSubjectId = id;
     state.selectedQuizFile = null;
@@ -931,10 +1119,67 @@ async function selectSubject(id) {
         flashcardBtn.disabled = false;
     }
 
-    // Clear chat
+    // Load saved conversation
     const msgs = document.getElementById('chat-messages');
-    msgs.innerHTML = `<div class="welcome-card"><h2>📖 ${subject.name}</h2><p>Upload notes and start asking questions. All answers are grounded in your uploaded materials only.</p></div>`;
 
+    msgs.innerHTML = `
+    <div class="welcome-card">
+        <h2>📖 ${subject.name}</h2>
+        <p>Loading conversation...</p>
+    </div>
+`;
+
+    try {
+        const response = await fetch(
+            `${API}/api/conversations/${id}`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${getAuthToken()}`
+                }
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('Failed to load conversation');
+        }
+
+        const data = await response.json();
+
+        msgs.innerHTML = '';
+
+        if (!data.messages || data.messages.length === 0) {
+            msgs.innerHTML = `
+            <div class="welcome-card">
+                <h2>📖 ${subject.name}</h2>
+                <p>
+                    Upload notes and start asking questions.
+                    All answers are grounded in your uploaded materials only.
+                </p>
+            </div>
+        `;
+        } else {
+            data.messages.forEach(message => {
+                if (message.role === 'user') {
+                    addMessage('user', message.content);
+                } else if (message.role === 'assistant') {
+                    addMessage('assistant', message.content);
+                }
+            });
+        }
+
+    } catch (error) {
+        console.error('Failed to load conversation:', error);
+
+        msgs.innerHTML = `
+        <div class="welcome-card">
+            <h2>📖 ${subject.name}</h2>
+            <p>
+                Upload notes and start asking questions.
+                All answers are grounded in your uploaded materials only.
+            </p>
+        </div>
+    `;
+    }
     // Reset quiz
     state.quizData = null;
     document.getElementById('quiz-container').innerHTML = '';
@@ -1080,31 +1325,20 @@ function renderFileList() {
         const isSelected = state.selectedQuizFile === f.filename;
 
         div.innerHTML = `
-            <span class="file-item-icon">📄</span>
+            <div class="file-item-main">
+                <span class="file-item-icon">📄</span>
 
-            <span class="file-item-name">
-                ${f.filename}
-            </span>
-
-            <span class="file-item-chunks">
-                ${f.chunks} chunks
-            </span>
+                <span class="file-item-name">
+                    ${escapeHtml(f.filename)}
+                </span>
+            </div>
 
             <button
-                class="quiz-document-btn"
+                class="quiz-document-btn ${isSelected ? 'selected' : ''}"
                 type="button"
                 title="Use this document for quiz"
-                style="
-                    margin-left:auto;
-                    padding:6px 10px;
-                    border:1px solid var(--border-color);
-                    border-radius:6px;
-                    background:${isSelected ? 'var(--accent-blue)' : 'white'};
-                    color:${isSelected ? 'white' : 'var(--text-primary)'};
-                    cursor:pointer;
-                "
             >
-                ${isSelected ? '✓ Quiz Selected' : 'Use for Quiz'}
+                ${isSelected ? '✓ Selected for Quiz' : 'Use for Quiz'}
             </button>
         `;
 
@@ -1255,8 +1489,10 @@ async function sendQuery(queryText) {
     try {
         const res = await fetch(`${API}/api/query`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getAuthToken()}`
+            }, body: JSON.stringify({
                 subject_id: state.activeSubjectId,
                 query: queryText,
             }),
@@ -1274,13 +1510,10 @@ async function sendQuery(queryText) {
         state.lastAnswer = data;
 
         if (!data.answer_found) {
-            // Refusal
-            addRefusalMessage(data);
+            addRefusalMessage(data, queryText);
         } else {
-            // Grounded answer
             addAnswerMessage(data, subject);
         }
-
         // XP for asking
         addXP(10, 'Ask question');
         checkStreak();
@@ -1300,32 +1533,187 @@ function addMessage(role, text, isError = false) {
     msgs.scrollTop = msgs.scrollHeight;
 }
 
-function addRefusalMessage(data) {
+function addRefusalMessage(data, queryText) {
     const msgs = document.getElementById('chat-messages');
     const div = document.createElement('div');
     div.className = 'message assistant';
 
     const matchClass = 'match-notfound';
+
     div.innerHTML = `
     <div class="message-bubble">
       <div class="refusal-message">${escapeHtml(data.answer)}</div>
+
       <div class="answer-meta">
-        <span class="meta-badge ${matchClass}">❌ ${data.retrieval_match_label || 'Not Found'}</span>
-        <span class="meta-badge" style="background:rgba(255,255,255,0.05);color:var(--text-muted)">Score: ${data.retrieval_match_score || 0}</span>
-        ${data.gate_fired ? `<span class="meta-badge" style="background:rgba(225,112,85,0.1);color:var(--accent-orange)">Gate: ${data.gate_fired}</span>` : ''}
+        <span class="meta-badge ${matchClass}">
+          ❌ ${data.retrieval_match_label || 'Not Found'}
+        </span>
+
+        <span class="meta-badge" style="background:rgba(255,255,255,0.05);color:var(--text-muted)">
+          Score: ${data.retrieval_match_score || 0}
+        </span>
+
+        ${data.gate_fired ? `
+          <span class="meta-badge" style="background:rgba(225,112,85,0.1);color:var(--accent-orange)">
+            Gate: ${data.gate_fired}
+          </span>
+        ` : ''}
+      </div>
+
+      <div style="margin-top:12px;">
+<button
+    class="ask-ai-btn"
+    data-query="${escapeHtml(queryText)}"
+    onclick="askAIFromButton(this)">
+    Ask AI
+</button>
       </div>
     </div>
-  `;
+    `;
+
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
 
     // TTS for refusal
     if (state.isSpeaking || state.autoSpeak) {
-        const subject = state.subjects.find(s => s.id === state.activeSubjectId);
+        const subject = state.subjects.find(
+            s => s.id === state.activeSubjectId
+        );
+
         speak(`I couldn't find that in your ${subject?.name || ''} notes`);
     }
 }
+function formatAnswer(text) {
+    if (!text) return '';
 
+    let html = escapeHtml(text);
+
+    // Headings
+    html = html.replace(/^### (.*)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^## (.*)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^# (.*)$/gm, '<h2>$1</h2>');
+
+    // Bold
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Italic
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Bullet lists
+    html = html.replace(
+        /(?:^|\n)- (.*(?:\n- .*)*)/g,
+        function (match) {
+            const items = match.trim().split('\n');
+            return '<ul>' +
+                items.map(item => `<li>${item.replace(/^- /, '')}</li>`).join('') +
+                '</ul>';
+        }
+    );
+
+    // Numbered lists
+    html = html.replace(
+        /(?:^|\n)(\d+)\. (.*(?:\n\d+\. .*)*)/g,
+        function (match) {
+            const items = match.trim().split('\n');
+            return '<ol>' +
+                items.map(item => `<li>${item.replace(/^\d+\. /, '')}</li>`).join('') +
+                '</ol>';
+        }
+    );
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Line breaks
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+}
+async function askAIForQuestion(queryText) {
+    if (!queryText || !queryText.trim()) return;
+
+    const msgs = document.getElementById('chat-messages');
+
+    // Show user's question again
+    addMessage('user', queryText);
+
+    // Typing indicator
+    const typingEl = document.createElement('div');
+    typingEl.className = 'message assistant';
+    typingEl.innerHTML = `
+        <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        </div>
+    `;
+
+    msgs.appendChild(typingEl);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    try {
+        const res = await fetch(`${API}/api/ai-answer`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: queryText
+            })
+        });
+
+        typingEl.remove();
+
+        if (!res.ok) {
+            const err = await res.json();
+            addMessage(
+                'assistant',
+                `⚠️ ${err.error || 'AI answer failed.'}`,
+                true
+            );
+            return;
+        }
+
+        const data = await res.json();
+
+        addFormattedMessage(
+            'assistant',
+            data.answer || 'The AI could not generate an answer.'
+        );
+
+    } catch (e) {
+        typingEl.remove();
+
+        addMessage(
+            'assistant',
+            `⚠️ Failed to get AI answer: ${e.message}`,
+            true
+        );
+    }
+}
+function addFormattedMessage(role, text, isError = false) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+
+    div.className = `message ${role}`;
+
+    div.innerHTML = `
+        <div class="message-bubble${isError ? ' refusal-message' : ''}">
+            ${formatAnswer(text)}
+        </div>
+    `;
+
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+}
+function askAIFromButton(button) {
+    const queryText = button.getAttribute('data-query');
+
+    console.log("Ask AI button clicked");
+    console.log("Question:", queryText);
+
+    askAIForQuestion(queryText);
+}
 function addAnswerMessage(data, subject) {
     const msgs = document.getElementById('chat-messages');
     const div = document.createElement('div');
@@ -1355,7 +1743,7 @@ function addAnswerMessage(data, subject) {
 
     div.innerHTML = `
     <div class="message-bubble">
-      <div class="answer-text">${escapeHtml(data.answer)}</div>
+<div class="answer-text">${formatAnswer(data.answer)}</div>
       <div class="answer-meta">
         <span class="meta-badge ${matchClass}">📊 ${data.retrieval_match_label} (${data.retrieval_match_score})</span>
         <span class="meta-badge grounding">🎯 ${data.grounding_percentage}% grounded</span>
@@ -1915,13 +2303,91 @@ function revealQuiz() {
 
     // Update game data
     const g = loadGameData();
-    g.quizHistory.push({ score, date: new Date().toISOString() });
+
+    const subject = state.subjects.find(
+        s => s.id === state.activeSubjectId
+    );
+
+    const subjectId = state.activeSubjectId;
+    const subjectName = subject?.name || 'Unknown';
+
+    // Save quiz history
+    // Calculate weak areas from the actual quiz answers
+    const weakAreas = [];
+    data.mcqs?.forEach((mcq, qi) => {
+        const userAnswer = state.quizAnswers[`mcq_${qi}`];
+
+        console.log("MCQ DATA:", mcq);
+        console.log("MCQ TOPIC:", mcq.topic);
+
+        if (userAnswer !== mcq.correct) {
+            weakAreas.push({
+                topic: mcq.topic || 'General',
+                score: 0
+            });
+        }
+    });
+
+    g.quizHistory.push({
+        score,
+        date: new Date().toISOString(),
+        subject: subjectName,
+        weakAreas: weakAreas
+    });
+
+    console.log("QUIZ SAVED:", {
+        score,
+        subject: subjectName,
+        subjectId,
+        weakAreas
+    });
+
+    // Update total quiz count
+    g.totalQuizzes = (g.totalQuizzes || 0) + 1;
+
+    // Initialize subject progress
+    if (!Array.isArray(g.subjectProgress)) {
+        g.subjectProgress = [];
+    }
+
+    // Find this subject's progress
+    let subjectProgress = g.subjectProgress.find(
+        item => item.subject_id === subjectId
+    );
+
+    if (!subjectProgress) {
+        subjectProgress = {
+            subject_id: subjectId,
+            subject_name: subjectName,
+            quizzes: 0,
+            total_score: 0,
+            accuracy: 0
+        };
+
+        g.subjectProgress.push(subjectProgress);
+    }
+
+    // Update subject statistics
+    subjectProgress.quizzes += 1;
+    subjectProgress.total_score += score;
+
+    subjectProgress.accuracy = Math.round(
+        (subjectProgress.total_score / subjectProgress.quizzes) * 100
+    );
+
+    // Save EVERYTHING once
+    saveGameData(g);
+
+    updateGamificationUI();
+
+    // Refresh analytics using the newly saved data
+    updateAnalytics(loadGameData());
+
+    // Add XP for perfect quiz
     if (score === 1 && total > 0) {
-        g.perfectQuizzes += 1;
         addXP(50, 'Perfect quiz');
     }
-    saveGameData(g);
-    updateGamificationUI();
+
 }
 
 // ═══════════════════════════════════════════════════════════════════════

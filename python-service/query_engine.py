@@ -59,6 +59,11 @@ Respond in valid JSON format ONLY (no markdown, no code fences):
     try:
         print("[DEBUG] Calling Groq LLM...")
 
+        print("\n" + "=" * 70)
+        print("[PROMPT SENT TO LLM]")
+        print(prompt)
+        print("=" * 70 + "\n")
+        
         response = llm.complete(prompt)
 
         print("[DEBUG] Groq response received")

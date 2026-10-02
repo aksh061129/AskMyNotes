@@ -22,6 +22,9 @@ from fastapi import UploadFile, File
 from handwriting_engine import transcribe_handwriting
 from pydantic import BaseModel
 
+from fastapi import FastAPI, HTTPException
+from config import GROQ_API_KEY, GROQ_MODEL, LLM_TEMPERATURE
+
 app = FastAPI(title="AskMyNotes RAG Service", version="1.0.0")
 
 # CORS — allow Node.js API layer
@@ -80,6 +83,8 @@ class QueryRequest(BaseModel):
     query: str
     conversation_history: list[dict] | None = None
 
+class AIAnswerRequest(BaseModel):
+    query: str
 
 @app.post("/py/query")
 def query_endpoint(req: QueryRequest):
@@ -94,7 +99,50 @@ def query_endpoint(req: QueryRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+@app.post("/py/ai-answer")
+def ai_answer_endpoint(req: dict):
+    """Answer a question using general AI when it is not found in notes."""
+    try:
+        query = req.get("query", "").strip()
 
+        if not query:
+            raise HTTPException(
+                status_code=400,
+                detail="Query is required"
+            )
+
+        from llama_index.llms.groq import Groq
+
+        llm = Groq(
+            model=GROQ_MODEL,
+            api_key=GROQ_API_KEY,
+            temperature=LLM_TEMPERATURE
+        )
+
+        prompt = f"""Answer the following question clearly and accurately.
+
+This question was not found in the student's uploaded notes, so you may use your general knowledge.
+
+QUESTION:
+{query}
+
+Give a concise, useful answer suitable for a student.
+"""
+
+        response = llm.complete(prompt)
+
+        return {
+            "answer": response.text.strip()
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 # ── Study ─────────────────────────────────────────────────────────────
 
