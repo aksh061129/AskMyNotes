@@ -18,6 +18,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 from config import DATA_DIR, CHUNK_SIZE, CHUNK_OVERLAP
 from embedder import embedder
+
 from llama_index.core.node_parser import SentenceSplitter
 
 
@@ -290,14 +291,15 @@ def ingest_document(subject_id: str, file_path: str) -> dict:
     elif ext == ".pptx":
         pages = _parse_pptx(file_path)
     elif ext == ".zip":
-        pages = _parse_pptx(file_path)
-    elif ext in (".png", ".jpg", ".jpeg", ".webp", ".zip"):
+        pages = _parse_zip(file_path)
+
+    elif ext in (".png", ".jpg", ".jpeg", ".webp"):
         pages = _parse_image(file_path)
     else:
         raise ValueError(f"Unsupported file type: {ext}")
 
-    if not pages:
-        return {"status": "empty", "chunks_added": 0}
+        if not pages:
+            return {"status": "empty", "chunks_added": 0}
 
     # Chunk
     chunks = _chunk_documents(pages)
@@ -346,4 +348,115 @@ def get_subject_stats(subject_id: str) -> dict:
         "total_chunks": len(meta),
         "total_vectors": index.ntotal if index else 0,
         "files": files,
+    }
+
+def delete_document(subject_id: str, filename: str):
+
+    subject_dir = DATA_DIR / subject_id
+
+    index_path = subject_dir / "index.faiss"
+    meta_path = subject_dir / "chunks_meta.json"
+
+    if not meta_path.exists():
+        raise FileNotFoundError(
+            "No indexed documents found for this subject."
+        )
+
+    with open(meta_path, "r", encoding="utf-8") as f:
+        metadata = json.load(f)
+
+    if not metadata:
+        raise FileNotFoundError(
+            "No documents found for this subject."
+        )
+
+    # Find chunks belonging to this file
+    remaining_metadata = [
+        item
+        for item in metadata
+        if item.get("filename") != filename
+    ]
+
+    removed_count = (
+        len(metadata) -
+        len(remaining_metadata)
+    )
+
+    if removed_count == 0:
+        raise FileNotFoundError(
+            f"File '{filename}' was not found."
+        )
+
+    # If no files remain
+    if not remaining_metadata:
+
+        if index_path.exists():
+            index_path.unlink()
+
+        meta_path.write_text(
+            "[]",
+            encoding="utf-8"
+        )
+
+        return {
+            "chunks_removed": removed_count,
+            "remaining_chunks": 0
+        }
+
+    # Rebuild FAISS index
+    old_index = faiss.read_index(
+        str(index_path)
+    )
+
+    # Determine vector dimension
+    dimension = old_index.d
+
+    new_index = faiss.IndexFlatIP(
+        dimension
+    )
+
+    # Re-create vectors for remaining chunks
+    texts = [
+        item.get("text", "")
+        for item in remaining_metadata
+    ]
+
+    # Use the existing embedding model
+    embeddings = embedder.encode(texts)
+
+    embeddings = np.asarray(
+        embeddings,
+        dtype="float32"
+    )
+
+    # Normalize for cosine similarity
+    faiss.normalize_L2(embeddings)
+
+    # Add rebuilt vectors
+    new_index.add(embeddings)
+
+    # Save new index
+    faiss.write_index(
+        new_index,
+        str(index_path)
+    )
+
+    # Save new metadata
+    with open(
+        meta_path,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            remaining_metadata,
+            f,
+            ensure_ascii=False,
+            indent=2
+        )
+
+    return {
+        "chunks_removed": removed_count,
+        "remaining_chunks": len(
+            remaining_metadata
+        )
     }

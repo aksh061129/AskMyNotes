@@ -172,24 +172,53 @@ function updateGamificationUI() {
         panel.appendChild(el);
     }
 
-    // Study calendar (last 28 days)
-    const cal = document.getElementById('study-calendar');
-    cal.innerHTML = '';
-    for (let i = 27; i >= 0; i--) {
-        const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-        const mins = g.studyDays[d] || 0;
-        const div = document.createElement('div');
-        div.className = 'cal-day';
-        if (mins >= 4) div.classList.add('level-4');
-        else if (mins >= 3) div.classList.add('level-3');
-        else if (mins >= 2) div.classList.add('level-2');
-        else if (mins >= 1) div.classList.add('level-1');
-        div.title = `${d}: ${mins} session(s)`;
-        cal.appendChild(div);
-    }
 
     // Analytics
     updateAnalytics(g);
+}
+
+function updateAnalyticsStudyPlanner(g) {
+
+    const calendar =
+        document.getElementById('analytics-study-calendar');
+
+    if (!calendar) return;
+
+    calendar.innerHTML = '';
+
+    const studyDays = g.studyDays || {};
+
+    // Show the last 28 days
+    for (let i = 27; i >= 0; i--) {
+
+        const date = new Date(
+            Date.now() - i * 86400000
+        ).toISOString().slice(0, 10);
+
+        const sessions =
+            studyDays[date] || 0;
+
+        const day =
+            document.createElement('div');
+
+        day.className =
+            'analytics-planner-day';
+
+        if (sessions >= 4) {
+            day.classList.add('level-4');
+        } else if (sessions >= 3) {
+            day.classList.add('level-3');
+        } else if (sessions >= 2) {
+            day.classList.add('level-2');
+        } else if (sessions >= 1) {
+            day.classList.add('level-1');
+        }
+
+        day.title =
+            `${date} · ${sessions} study session${sessions !== 1 ? 's' : ''}`;
+
+        calendar.appendChild(day);
+    }
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -844,6 +873,10 @@ function updateAnalytics(g) {
 
     // Personalized Study Plan
     renderStudyPlan(history);
+    // Analytics Study Planner
+    updateAnalyticsStudyPlanner(g);
+
+
 }
 
 
@@ -982,6 +1015,10 @@ function renderStudyPlan(history) {
         planEl.appendChild(div);
     });
 }
+// ═══════════════════════════════════════════════════════════════
+// ANALYTICS STUDY PLANNER
+// ═══════════════════════════════════════════════════════════════
+
 
 // ═══════════════════════════════════════════════════════════════════════
 // SUBJECTS
@@ -1314,23 +1351,42 @@ async function uploadFile(file) {
 
 function renderFileList() {
     const list = document.getElementById('file-list');
+
+    if (!list) return;
+
     list.innerHTML = '';
 
-    const files = state.uploadedFiles[state.activeSubjectId] || [];
+    const files =
+        state.uploadedFiles[state.activeSubjectId] || [];
 
     for (const f of files) {
+
         const div = document.createElement('div');
         div.className = 'file-item';
 
-        const isSelected = state.selectedQuizFile === f.filename;
+        const isSelected =
+            state.selectedQuizFile === f.filename;
 
         div.innerHTML = `
-            <div class="file-item-main">
-                <span class="file-item-icon">📄</span>
+            <div class="file-item-header">
 
-                <span class="file-item-name">
-                    ${escapeHtml(f.filename)}
-                </span>
+                <div class="file-item-main">
+                    <span class="file-item-icon">📄</span>
+
+                    <span class="file-item-name">
+                        ${escapeHtml(f.filename)}
+                    </span>
+                </div>
+
+                <button
+                    class="file-delete-btn"
+                    type="button"
+                    title="Delete this note"
+                    aria-label="Delete ${escapeHtml(f.filename)}"
+                >
+                    ×
+                </button>
+
             </div>
 
             <button
@@ -1338,13 +1394,35 @@ function renderFileList() {
                 type="button"
                 title="Use this document for quiz"
             >
-                ${isSelected ? '✓ Selected for Quiz' : 'Use for Quiz'}
+                ${isSelected
+                ? '✓ Selected for Quiz'
+                : 'Use for Quiz'}
             </button>
         `;
 
-        const quizButton = div.querySelector('.quiz-document-btn');
+        // ─────────────────────────────────────
+        // DELETE BUTTON
+        // ─────────────────────────────────────
+
+        const deleteButton =
+            div.querySelector('.file-delete-btn');
+
+        deleteButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            deleteUploadedFile(f.filename);
+        });
+
+
+        // ─────────────────────────────────────
+        // QUIZ BUTTON
+        // ─────────────────────────────────────
+
+        const quizButton =
+            div.querySelector('.quiz-document-btn');
 
         quizButton.addEventListener('click', (e) => {
+
             e.stopPropagation();
 
             state.selectedQuizFile = f.filename;
@@ -1352,7 +1430,9 @@ function renderFileList() {
             renderFileList();
 
             const selectedText =
-                document.getElementById('selected-quiz-document');
+                document.getElementById(
+                    'selected-quiz-document'
+                );
 
             if (selectedText) {
                 selectedText.textContent =
@@ -1361,6 +1441,81 @@ function renderFileList() {
         });
 
         list.appendChild(div);
+    }
+}
+
+async function deleteUploadedFile(filename) {
+
+    if (!state.activeSubjectId) {
+        return;
+    }
+
+    const confirmed = confirm(
+        `Are you sure you want to delete "${filename}" from this subject?`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API}/api/files/${state.activeSubjectId}/${encodeURIComponent(filename)}`,
+            {
+                method: 'DELETE'
+            }
+        );
+
+        if (!response.ok) {
+
+            let message = 'Failed to delete the note.';
+
+            try {
+                const data = await response.json();
+                message = data.error || message;
+            } catch (e) {
+                // Keep default message
+            }
+
+            throw new Error(message);
+        }
+
+        // Remove from frontend state
+        state.uploadedFiles[state.activeSubjectId] =
+            (state.uploadedFiles[state.activeSubjectId] || [])
+                .filter(file => file.filename !== filename);
+
+        // If this was selected for quiz, clear selection
+        if (state.selectedQuizFile === filename) {
+
+            state.selectedQuizFile = null;
+
+            const selectedText =
+                document.getElementById(
+                    'selected-quiz-document'
+                );
+
+            if (selectedText) {
+                selectedText.textContent =
+                    'No quiz document selected';
+            }
+        }
+
+        // Refresh sidebar
+        renderFileList();
+
+    } catch (error) {
+
+        console.error(
+            'Failed to delete uploaded file:',
+            error
+        );
+
+        alert(
+            error.message ||
+            'Failed to delete the note.'
+        );
     }
 }
 async function transcribeHandwriting() {
@@ -2501,48 +2656,107 @@ function stopSpeaking() {
 // POMODORO
 // ═══════════════════════════════════════════════════════════════════════
 function setupPomodoro() {
-    document.getElementById('pomodoro-btn').addEventListener('click', togglePomodoro);
+    const pomodoroBtn =
+        document.getElementById('analytics-pomodoro-btn');
+
+    if (!pomodoroBtn) {
+        return;
+    }
+
+    // Prevent duplicate event listeners
+    if (pomodoroBtn.dataset.pomodoroInitialized === 'true') {
+        updatePomodoroDisplay();
+        return;
+    }
+
+    pomodoroBtn.addEventListener(
+        'click',
+        togglePomodoro
+    );
+
+    pomodoroBtn.dataset.pomodoroInitialized = 'true';
+
     updatePomodoroDisplay();
 }
-
 function togglePomodoro() {
+    const pomodoroBtn =
+        document.getElementById('analytics-pomodoro-btn');
+
+    if (!pomodoroBtn) {
+        return;
+    }
+
     if (state.pomodoroRunning) {
+
         clearInterval(state.pomodoroInterval);
+
         state.pomodoroRunning = false;
-        document.getElementById('pomodoro-btn').textContent = '▶ Start Focus';
+
+        pomodoroBtn.textContent = '▶ Start Focus';
+
     } else {
+
         state.pomodoroRunning = true;
         state.pomodoroSeconds = 25 * 60;
-        document.getElementById('pomodoro-btn').textContent = '⏹ Stop';
+
+        pomodoroBtn.textContent = '⏹ Stop';
+
         state.pomodoroInterval = setInterval(() => {
+
             state.pomodoroSeconds--;
+
             updatePomodoroDisplay();
+
             if (state.pomodoroSeconds <= 0) {
+
                 clearInterval(state.pomodoroInterval);
+
                 state.pomodoroRunning = false;
-                document.getElementById('pomodoro-btn').textContent = '▶ Start Focus';
-                // Notify
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('🍅 Pomodoro Complete!', { body: 'Time for a 5 minute break.' });
+
+                pomodoroBtn.textContent = '▶ Start Focus';
+
+                if (
+                    'Notification' in window &&
+                    Notification.permission === 'granted'
+                ) {
+                    new Notification(
+                        '🍅 Pomodoro Complete!',
+                        {
+                            body: 'Time for a 5 minute break.'
+                        }
+                    );
                 }
+
                 addXP(20, 'Pomodoro complete');
             }
+
         }, 1000);
 
-        // Request notification permission
-        if ('Notification' in window && Notification.permission === 'default') {
+        if (
+            'Notification' in window &&
+            Notification.permission === 'default'
+        ) {
             Notification.requestPermission();
         }
     }
 }
-
 function updatePomodoroDisplay() {
-    const mins = Math.floor(state.pomodoroSeconds / 60);
-    const secs = state.pomodoroSeconds % 60;
-    document.getElementById('pomodoro-time').textContent =
+    const timeEl =
+        document.getElementById('analytics-pomodoro-time');
+
+    if (!timeEl) {
+        return;
+    }
+
+    const mins =
+        Math.floor(state.pomodoroSeconds / 60);
+
+    const secs =
+        state.pomodoroSeconds % 60;
+
+    timeEl.textContent =
         `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
-
 // ═══════════════════════════════════════════════════════════════════════
 // MODE TABS
 // ═══════════════════════════════════════════════════════════════════════

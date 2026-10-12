@@ -3422,3 +3422,264 @@ body {
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow-purple);
 }
+
+/* =========================================================
+   ANALYTICS STUDY PLANNER
+   ========================================================= */
+
+.analytics-study-planner {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-study-planner h3 {
+  margin-bottom: 6px;
+}
+
+.analytics-planner-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+/* 28-day activity grid */
+.analytics-planner-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 28px);
+  grid-auto-rows: 28px;
+  gap: 7px;
+
+  justify-content: center;
+
+  margin: 4px auto 18px;
+}
+
+/* Individual day */
+.analytics-planner-day {
+  width: 28px;
+  height: 28px;
+
+  border-radius: 6px;
+
+  background: var(--bg-tertiary);
+
+  border: 1px solid transparent;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.analytics-planner-day:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Activity levels */
+.analytics-planner-day.level-1 {
+  background: rgba(108, 92, 231, 0.16);
+}
+
+.analytics-planner-day.level-2 {
+  background: rgba(108, 92, 231, 0.32);
+}
+
+.analytics-planner-day.level-3 {
+  background: rgba(108, 92, 231, 0.55);
+}
+
+.analytics-planner-day.level-4 {
+  background: var(--accent-purple);
+}
+
+/* Legend */
+.analytics-planner-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  font-size: 10px;
+  color: var(--text-muted);
+
+  margin-bottom: 18px;
+}
+
+.analytics-planner-legend-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+}
+
+.analytics-planner-legend-box.level-1 {
+  background: rgba(108, 92, 231, 0.16);
+}
+
+.analytics-planner-legend-box.level-2 {
+  background: rgba(108, 92, 231, 0.32);
+}
+
+.analytics-planner-legend-box.level-3 {
+  background: rgba(108, 92, 231, 0.55);
+}
+
+.analytics-planner-legend-box.level-4 {
+  background: var(--accent-purple);
+}
+
+/* Focus timer */
+.analytics-planner-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+
+  margin-top: auto;
+}
+
+#analytics-pomodoro-time {
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+
+  color: var(--accent-purple);
+}
+
+#analytics-pomodoro-btn {
+  white-space: nowrap;
+}
+
+/* Keep the two bottom Analytics cards balanced */
+.analytics-study-planner,
+.analytics-card:has(#study-plan-list) {
+  min-height: 260px;
+}
+
+@media (max-width: 800px) {
+
+  .analytics-planner-grid {
+    grid-template-columns: repeat(7, 24px);
+    grid-auto-rows: 24px;
+    gap: 5px;
+  }
+
+  .analytics-planner-day {
+    width: 24px;
+    height: 24px;
+  }
+
+  #analytics-pomodoro-time {
+    font-size: 26px;
+  }
+}
+
+/* =========================================================
+   FILE ITEM DELETE BUTTON
+   ========================================================= */
+
+.file-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.file-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-item-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-delete-btn {
+  width: 24px;
+  height: 24px;
+
+  border: none;
+  background: transparent;
+
+  color: #9aa5b1;
+
+  font-size: 20px;
+  line-height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.file-delete-btn:hover {
+  background: rgba(220, 70, 70, 0.10);
+  color: #d64545;
+}
+
+.file-delete-btn:active {
+  transform: scale(0.94);
+}
+
+.ask-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 18px;
+  min-height: 36px;
+
+  border: 1px solid #6c5ce7;
+  border-radius: 8px;
+
+  background: #ffffff;
+  color: #5b4de0;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.ask-ai-btn:hover {
+  background: #6c5ce7;
+  color: #ffffff;
+  border-color: #6c5ce7;
+
+  box-shadow: 0 3px 10px rgba(108, 92, 231, 0.18);
+}
+
+.ask-ai-btn:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.ask-ai-btn:focus-visible {
+  outline: 2px solid rgba(108, 92, 231, 0.35);
+  outline-offset: 2px;
+}

@@ -584,16 +584,6 @@
             <span id="xp-progress-text" class="xp-progress-text">0 / 200 XP</span>
           </div>
         </section>
-
-        <!-- Study Planning -->
-        <section class="sidebar-section">
-          <h2 class="section-title"><span>📅</span> Study Planner</h2>
-          <div id="study-calendar" class="study-calendar"></div>
-          <div id="pomodoro" class="pomodoro">
-            <span id="pomodoro-time">25:00</span>
-            <button id="pomodoro-btn" class="btn btn-sm btn-outline">▶ Start Focus</button>
-          </div>
-        </section>
       </aside>
 
       <!-- ── Content Area ─────────────────────────────── -->
@@ -898,13 +888,57 @@
 
               <div id="study-plan-list"></div>
 
-              <button class="start-study-btn" id="start-study-btn" type="button">
-                Start Study Session
-              </button>
+
+
+            </div>
+            <!-- Analytics Study Planner -->
+            <div class="analytics-card analytics-study-planner">
+
+              <h3>📅 Study Planner</h3>
+
+              <div class="analytics-planner-subtitle">
+                Your study activity over the last 28 days
+              </div>
+
+              <div class="analytics-planner-grid" id="analytics-study-calendar">
+              </div>
+
+              <div class="analytics-planner-legend">
+
+                <span>Less</span>
+
+                <span class="analytics-planner-legend-box"></span>
+
+                <span class="analytics-planner-legend-box level-1"></span>
+
+                <span class="analytics-planner-legend-box level-2"></span>
+
+                <span class="analytics-planner-legend-box level-3"></span>
+
+                <span class="analytics-planner-legend-box level-4"></span>
+
+                <span>More</span>
+
+              </div>
+
+              <div class="analytics-planner-footer">
+
+                <span id="analytics-pomodoro-time">
+                  25:00
+                </span>
+
+                <button id="analytics-pomodoro-btn" class="btn btn-sm btn-outline">
+                  ▶ Start Focus
+                </button>
+
+              </div>
 
             </div>
           </div>
         </div>
+
+
+
       </div>
     </main>
 

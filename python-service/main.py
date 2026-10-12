@@ -7,13 +7,17 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-
+from fastapi import HTTPException
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from config import DATA_DIR
-from ingestion import ingest_document, get_subject_stats
+from ingestion import (
+    ingest_document,
+    get_subject_stats,
+    delete_document
+)
 from query_engine import query as run_query
 from study_engine import generate_study_questions
 from simplify_engine import simplify_answer
@@ -211,6 +215,40 @@ def delete_subject(subject_id: str):
         return {"status": "deleted", "subject_id": subject_id}
     return {"status": "not_found", "subject_id": subject_id}
 
+
+@app.delete("/py/file/{subject_id}/{filename}")
+def delete_file(subject_id: str, filename: str):
+
+    try:
+        result = delete_document(
+            subject_id,
+            filename
+        )
+
+        return {
+            "status": "deleted",
+            "subject_id": subject_id,
+            "filename": filename,
+            **result
+        }
+
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=404,
+            detail=str(e)
+        )
+
+    except Exception as e:
+        print(
+            f"Error deleting file '{filename}' "
+            f"from subject '{subject_id}':",
+            e
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 @app.post("/py/handwriting")
 async def handwriting_endpoint(file: UploadFile = File(...)):
     try:

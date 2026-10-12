@@ -481,6 +481,61 @@ app.post("/api/upload/:subjectId", upload.single("file"), async (req, res) => {
     fs.unlink(req.file.path, () => { });
   }
 });
+
+// ── Delete Individual File ─────────────────────────────────────
+
+app.delete(
+  "/api/files/:subjectId/:filename",
+  async (req, res) => {
+
+    const subject =
+      subjects.find(
+        s => s.id === req.params.subjectId
+      );
+
+    if (!subject) {
+      return res.status(404).json({
+        error: "Subject not found"
+      });
+    }
+
+    const filename =
+      decodeURIComponent(req.params.filename);
+
+    if (!filename) {
+      return res.status(400).json({
+        error: "Filename is required"
+      });
+    }
+
+    try {
+
+      const pyRes = await axios.delete(
+        `${PYTHON_SERVICE}/py/file/${encodeURIComponent(
+          subject.id
+        )}/${encodeURIComponent(filename)}`
+      );
+
+      res.json(
+        pyRes.data || {
+          status: "deleted",
+          filename
+        }
+      );
+
+    } catch (e) {
+
+      const msg =
+        e.response?.data?.detail ||
+        e.response?.data?.error ||
+        e.message;
+
+      res.status(500).json({
+        error: msg
+      });
+    }
+  }
+);
 // ── Query ────────────────────────────────────────────────────────────
 
 app.post("/api/query", async (req, res) => {
