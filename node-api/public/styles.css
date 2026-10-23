@@ -1510,30 +1510,121 @@ body {
 /* ══════════════════════════════════════════════════════════════════════════
    AUTHENTICATION SCREEN STYLES (Sign Up & Login)
    ══════════════════════════════════════════════════════════════════════════ */
+
 .auth-wrapper {
   min-height: 100vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 50% 0%, #f1f5f9 0%, #f8fafc 100%);
-  padding: 24px;
+  background: linear-gradient(135deg,
+      #f8f6ff 0%,
+      #eee8ff 50%,
+      #e6ddff 100%);
+  padding: 32px 24px;
 }
+
+
 
 .auth-card {
   width: 100%;
-  max-width: 440px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  padding: 36px 32px;
+  max-width: 1120px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 22px;
+  box-shadow: 0 18px 55px rgba(108, 92, 231, 0.14);
+  padding: 0;
+  overflow: hidden;
 }
+
+/* Two-column authentication layout */
+.auth-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 630px;
+}
+
+/* LEFT PANEL — Login and Signup forms */
+
+.auth-left-panel {
+  padding: 42px 48px;
+  background: rgba(255, 255, 255, 0.94);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+
+/* RIGHT PANEL — Lavender glass effect */
+.auth-right-panel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 28px;
+  min-width: 0;
+
+  background: linear-gradient(145deg,
+      rgba(225, 212, 255, 0.80),
+      rgba(198, 181, 253, 0.65));
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* Illustration content */
+.auth-illustration-content {
+  width: 100%;
+  max-width: 390px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 24px;
+}
+
+/* Right-side heading */
+.auth-illustration-content h2 {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.6px;
+  color: var(--accent-purple);
+  margin: 0;
+  transform: translateY(-45px);
+}
+
+/* Student illustration */
+.auth-study-image {
+  display: block;
+  width: 100%;
+  max-width: 370px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Bottom tagline */
+.auth-illustration-content p {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--accent-purple);
+  margin: 0;
+}
+
+
 
 .auth-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+  transform: none;
 }
+
 
 .auth-header .logo {
   display: inline-flex;
@@ -1783,7 +1874,7 @@ body {
 .home-container {
   min-height: 100vh;
   width: 100%;
-  background: #ffffff;
+  background: #f1ecfa;
   color: #0f172a;
   overflow-y: auto;
   overflow-x: hidden;
@@ -3682,4 +3773,52 @@ body {
 .ask-ai-btn:focus-visible {
   outline: 2px solid rgba(108, 92, 231, 0.35);
   outline-offset: 2px;
+}
+
+/* Authentication responsive layout */
+@media (max-width: 768px) {
+  .auth-wrapper {
+    padding: 20px 14px;
+  }
+
+  .auth-split-layout {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .auth-left-panel {
+    padding: 32px 24px;
+  }
+
+  .auth-right-panel {
+    padding: 32px 24px;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .auth-illustration-content {
+    gap: 16px;
+  }
+
+  .auth-illustration-content h2 {
+    font-size: 24px;
+  }
+
+  .auth-study-image {
+    max-width: 260px;
+  }
+
+  .auth-illustration-content p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 400px) {
+  .auth-left-panel {
+    padding: 28px 18px;
+  }
+
+  .auth-toggle {
+    flex-wrap: wrap;
+  }
 }

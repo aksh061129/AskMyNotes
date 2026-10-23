@@ -16,83 +16,117 @@
 
 <body>
 
+
   <!-- ════ Authentication Screen ════ -->
   <div id="auth-container" class="auth-wrapper">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="logo">
-          <span class="logo-icon">📚</span>
-          <h1>AskMyNotes</h1>
+
+    <div class="auth-card auth-split-layout">
+
+      <!-- LEFT SIDE: Existing authentication forms -->
+      <div class="auth-left-panel">
+
+        <div class="auth-header">
+          <div class="logo">
+            <span class="logo-icon">📚</span>
+            <h1>AskMyNotes</h1>
+          </div>
+          <p class="auth-subtitle">Evidence-grounded study copilot</p>
         </div>
-        <p class="auth-subtitle">Evidence-grounded study copilot</p>
+
+
+        <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+
+        <!-- Sign Up View -->
+        <form id="signup-form" class="auth-form" style="display: none;">
+          <h2 class="auth-title">Create Student Account</h2>
+          <p class="auth-desc">Answer questions strictly grounded in your study notes</p>
+
+          <div class="auth-field">
+            <label for="signup-name">Student Name</label>
+            <input type="text" id="signup-name" placeholder="e.g. Jane Doe" required autocomplete="name" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-email">Email or Username</label>
+            <input type="text" id="signup-email" placeholder="student@university.edu" required
+              autocomplete="username" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-password">Password</label>
+            <input type="password" id="signup-password" placeholder="At least 6 characters" required
+              autocomplete="new-password" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signup-confirm-password">Confirm Password</label>
+            <input type="password" id="signup-confirm-password" placeholder="Repeat your password" required
+              autocomplete="new-password" />
+          </div>
+
+          <button type="submit" id="signup-btn" class="btn btn-primary auth-btn">
+            <span>Sign Up</span>
+          </button>
+
+          <div class="auth-toggle">
+            <span>Already have an account?</span>
+            <button type="button" id="switch-to-login" class="auth-switch-link">Login</button>
+          </div>
+        </form>
+
+        <!-- Login View -->
+        <form id="login-form" class="auth-form">
+          <h2 class="auth-title">Student Login</h2>
+          <p class="auth-desc">Welcome back! Sign in to access your subjects and quizzes</p>
+
+          <div class="auth-field">
+            <label for="login-email">Email or Username</label>
+            <input type="text" id="login-email" placeholder="student@university.edu" required autocomplete="username" />
+          </div>
+
+          <div class="auth-field">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="Enter your password" required
+              autocomplete="current-password" />
+          </div>
+
+          <button type="submit" id="login-btn" class="btn btn-primary auth-btn">
+            <span>Login</span>
+          </button>
+
+          <div class="auth-toggle">
+            <span>Don't have an account?</span>
+            <button type="button" id="switch-to-signup" class="auth-switch-link">Sign Up</button>
+          </div>
+
+        </form>
+
       </div>
+      <!-- END LEFT PANEL -->
 
-      <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+      <!-- RIGHT SIDE: Lavender illustration panel -->
+      <div class="auth-right-panel">
 
-      <!-- Sign Up View -->
-      <form id="signup-form" class="auth-form" style="display: none;">
-        <h2 class="auth-title">Create Student Account</h2>
-        <p class="auth-desc">Answer questions strictly grounded in your study notes</p>
+        <div class="auth-illustration-content">
 
-        <div class="auth-field">
-          <label for="signup-name">Student Name</label>
-          <input type="text" id="signup-name" placeholder="e.g. Jane Doe" required autocomplete="name" />
+          <h2>Study Smarter<br>with AI</h2>
+
+          <img src="assets/study-illustration.png" alt="Student studying with AI using a laptop"
+            class="auth-study-image" />
+
+          <p>
+            Your notes. Your answers.<br>
+            Your study companion.
+          </p>
+
         </div>
 
-        <div class="auth-field">
-          <label for="signup-email">Email or Username</label>
-          <input type="text" id="signup-email" placeholder="student@university.edu" required autocomplete="username" />
-        </div>
+      </div>
+      <!-- END RIGHT PANEL -->
 
-        <div class="auth-field">
-          <label for="signup-password">Password</label>
-          <input type="password" id="signup-password" placeholder="At least 6 characters" required
-            autocomplete="new-password" />
-        </div>
-
-        <div class="auth-field">
-          <label for="signup-confirm-password">Confirm Password</label>
-          <input type="password" id="signup-confirm-password" placeholder="Repeat your password" required
-            autocomplete="new-password" />
-        </div>
-
-        <button type="submit" id="signup-btn" class="btn btn-primary auth-btn">
-          <span>Sign Up</span>
-        </button>
-
-        <div class="auth-toggle">
-          <span>Already have an account?</span>
-          <button type="button" id="switch-to-login" class="auth-switch-link">Login</button>
-        </div>
-      </form>
-
-      <!-- Login View -->
-      <form id="login-form" class="auth-form">
-        <h2 class="auth-title">Student Login</h2>
-        <p class="auth-desc">Welcome back! Sign in to access your subjects and quizzes</p>
-
-        <div class="auth-field">
-          <label for="login-email">Email or Username</label>
-          <input type="text" id="login-email" placeholder="student@university.edu" required autocomplete="username" />
-        </div>
-
-        <div class="auth-field">
-          <label for="login-password">Password</label>
-          <input type="password" id="login-password" placeholder="Enter your password" required
-            autocomplete="current-password" />
-        </div>
-
-        <button type="submit" id="login-btn" class="btn btn-primary auth-btn">
-          <span>Login</span>
-        </button>
-
-        <div class="auth-toggle">
-          <span>Don't have an account?</span>
-          <button type="button" id="switch-to-signup" class="auth-switch-link">Sign Up</button>
-        </div>
-      </form>
     </div>
   </div>
+
   <!-- ═══════════════════════════════════════════════════════════════
      STUDENT LANDING / HOME PAGE
      ═══════════════════════════════════════════════════════════════ -->
